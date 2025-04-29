@@ -8,12 +8,15 @@ project(
 # ################### Packages ####################
 find_package(mippp REQUIRED)
 
-# ################### LIB target ####################
+# ################### Modules ####################
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+include(CompilerWarnings)
+include(CompilerOptimizations)
+
+# ################### Targets #####################
 add_executable(nqueens src/main.cpp)
+target_include_directories(nqueens PUBLIC include)
 target_link_libraries(nqueens mippp::mippp)
 
-target_include_directories(nqueens PUBLIC include)
-target_include_directories(nqueens PUBLIC $ENV{GUROBI_HOME}/include)
-
-
-target_compile_options(nqueens PUBLIC -Wall -Wextra -Wshadow)
+set_project_optimizations(nqueens)
+set_project_warnings(nqueens)
