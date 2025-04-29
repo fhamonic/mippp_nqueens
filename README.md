@@ -1,4 +1,4 @@
-The following table contains the time *Millisecondes* to fill a MILP for each of the popular solvers supported.
+The following table contains the time *in Milliseconds* requires by mippp to fill a N-Queens MILP model for each of the popular solvers supported.
 These results are to be compared with the [Python-MIP benchmarks](https://python-mip.readthedocs.io/en/latest/bench.html#) of python interfaces.
 
 | N    | Cbc  | CPLEX | Gurobi | Highs | MOSEK | SCIP  |
