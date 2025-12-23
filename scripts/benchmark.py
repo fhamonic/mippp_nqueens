@@ -1,11 +1,11 @@
+import os
 import subprocess
-import itertools
 
 
-def call_executable(executable_path, arg1, arg2):
+def call_executable(cmd):
     try:
         process = subprocess.run(
-            [executable_path, arg1, arg2],
+            cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
@@ -16,18 +16,24 @@ def call_executable(executable_path, arg1, arg2):
         raise Exception(e.stderr.strip())
 
 
+results_dir = "results"
+os.makedirs(results_dir, exist_ok=True)
+
 if __name__ == "__main__":
-    executable = "./build/nqueens"
-    solvers = ["Cbc", "CPLEX", "Gurobi", "Highs", "MOSEK", "SCIP"]
+    solvers = ["Cbc", "CPLEX", "Gurobi", "Highs", "MOSEK", "SCIP", "COPT"]
     values = [str(v) for v in range(100, 1001, 100)]
 
-    print(f"N", end="")
-    for solver in solvers:
-        print(f" | {solver}", end="")
-    print()
-    for value in values:
-        print(f"{value}", end="")
+    for exec in ["mippp", "mippp_bulk"]:
         for solver in solvers:
-            result = call_executable(executable, solver, value).split(",")
-            print(f" | {result[3]}", end="")
-        print()
+            with open(f"{results_dir}/{solver}_{exec}.csv", "w") as f:
+                for value in values:
+                    result = call_executable(["./build/" + exec, solver, value]).split(
+                        ","
+                    )
+                    f.write(f"{value},{(float(result[2])+float(result[3]))/1000:.1f}\n")
+
+    for exec in ["c", "c_bulk"]:
+        with open(f"{results_dir}/Gurobi_{exec}.csv", "w") as f:
+            for value in values:
+                result = call_executable(["./build/" + exec, value]).split(",")
+                f.write(f"{value},{float(result[-1])/1000:.1f}\n")
