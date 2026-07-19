@@ -1,5 +1,5 @@
 BUILD_DIR = build
-BUILD_TYPE = default_c++26
+BUILD_TYPE = gcc15_c++26
 # BUILD_TYPE = debug
 
 .PHONY: all test clean $(BUILD_DIR)

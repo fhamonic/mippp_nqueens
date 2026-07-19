@@ -1,0 +1,3 @@
+[submodule "extern/python-mip"]
+	path = extern/python-mip
+	url = https://github.com/coin-or/python-mip.git

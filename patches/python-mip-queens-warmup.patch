@@ -1,0 +1,14 @@
+diff --git a/benchmarks/queens.py b/benchmarks/queens.py
+index 9bbd53a..f5358f1 100644
+--- a/benchmarks/queens.py
++++ b/benchmarks/queens.py
+@@ -79,6 +79,9 @@ f = open("queens-mip-{}.csv".format(argv[1]), "w")
+ # outfd = os.open(PROFILE_FILE, flags)
+ # vmprof.enable(outfd, period=0.01)
+ 
++
++gen_model(100, argv[1], f)
++
+ for n in N:
+     gen_model(n, argv[1], f)
+     f.write(

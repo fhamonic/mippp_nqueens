@@ -9,8 +9,8 @@
 #include "mippp/solvers/mosek/all.hpp"
 #include "mippp/solvers/scip/all.hpp"
 
-using namespace fhamonic::mippp;
-using namespace fhamonic::mippp::operators;
+using namespace mippp;
+using namespace mippp::operators;
 
 #include "chrono.hpp"
 

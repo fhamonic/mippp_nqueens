@@ -9,8 +9,8 @@
 #include "mippp/solvers/mosek/all.hpp"
 #include "mippp/solvers/scip/all.hpp"
 
-using namespace fhamonic::mippp;
-using namespace fhamonic::mippp::operators;
+using namespace mippp;
+using namespace mippp::operators;
 
 #include "chrono.hpp"
 
@@ -49,7 +49,7 @@ int run(const int N) {
     int api_time_us = chrono.lapTimeUs();
     MODEL model(api);
 
-    auto X_vars = model.add_binary_variables(
+    auto X = model.add_binary_variables(
         N * N, [N](int row, int col) { return row * N + col; });
 
     ///////////////////////////////////////////////////////////////////////////
@@ -57,58 +57,54 @@ int run(const int N) {
     ///////////////////////////////////////////////////////////////////////////
     // one per row
     model.add_constraints(indices, [&](auto && row) {
-        return xsum(indices, [&](auto && col) { return X_vars(row, col); }) ==
-               1;
+        return xsum(indices, [&](auto && col) { return X(row, col); }) == 1;
     });
     // one per column
     model.add_constraints(indices, [&](auto && col) {
-        return xsum(indices, [&](auto && row) { return X_vars(row, col); }) ==
-               1;
+        return xsum(indices, [&](auto && row) { return X(row, col); }) == 1;
     });
     // one per upper diagonal \ //
     model.add_constraints(
         std::ranges::views::iota(0, N - 1), [&](auto && top_col) {
             return xsum(std::ranges::views::iota(0, N - top_col),
-                        [&](auto && row) {
-                            return X_vars(row, top_col + row);
-                        }) <= 1;
+                        [&](auto && row) { return X(row, top_col + row); }) <=
+                   1;
         });
     // one per lower diagonal \ //
     model.add_constraints(
         std::ranges::views::iota(1, N - 1), [&](auto && left_row) {
             return xsum(std::ranges::views::iota(0, N - left_row),
-                        [&](auto && col) {
-                            return X_vars(left_row + col, col);
-                        }) <= 1;
+                        [&](auto && col) { return X(left_row + col, col); }) <=
+                   1;
         });
     // one per upper diagonal / //
     model.add_constraints(
         std::ranges::views::iota(1, N), [&](auto && left_row) {
             return xsum(std::ranges::views::iota(0, left_row + 1),
-                        [&](auto && col) {
-                            return X_vars(left_row - col, col);
-                        }) <= 1;
+                        [&](auto && col) { return X(left_row - col, col); }) <=
+                   1;
         });
     // one per lower diagonal / //
     model.add_constraints(
         std::ranges::views::iota(1, N - 1), [&](auto && bottom_col) {
             return xsum(std::ranges::views::iota(bottom_col, N),
                         [&](auto && col) {
-                            return X_vars(N - 1 - (col - bottom_col), col);
+                            return X(N - 1 - (col - bottom_col), col);
                         }) <= 1;
         });
 
     (void)model.num_constraints();
 
     int fill_time_us = chrono.lapTimeUs();
-    std::cerr << ',' << api_time_us << ',' << fill_time_us;
+    std::cerr << ',' << model.num_variables() << ',' << model.num_constraints()
+              << ',' << api_time_us << ',' << fill_time_us;
 
     if(N < 20) {
         model.solve();
         auto solution = model.get_solution();
         for(auto i : indices) {
             for(auto j : indices) {
-                std::cerr << ' ' << (solution[X_vars(i, j)] ? 'o' : '.');
+                std::cerr << ' ' << (solution[X(i, j)] ? 'o' : '.');
             }
             std::cerr << std::endl;
         }

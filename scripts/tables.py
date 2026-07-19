@@ -2,13 +2,19 @@ import os
 
 results_dir = "results"
 
+# produced by scripts/benchmark_python.sh
+python_mip_results_dir = os.path.join(results_dir, "python-mip")
 python_mip_benchmarks = [
-    "/home/plaiseek/Softwares/python-mip/benchmarks/queens-pulp-cpython.csv",
-    "/home/plaiseek/Softwares/python-mip/benchmarks/queens-gurobi-cpython.csv",
-    "/home/plaiseek/Softwares/python-mip/benchmarks/queens-mip-cbc-pypy.csv",
-    "/home/plaiseek/Softwares/python-mip/benchmarks/queens-mip-grb-pypy.csv",
-    "/home/plaiseek/Softwares/python-mip/benchmarks/queens-mip-cbc-cpython.csv",
-    "/home/plaiseek/Softwares/python-mip/benchmarks/queens-mip-grb-cpython.csv",
+    os.path.join(python_mip_results_dir, f)
+    for f in [
+        "queens-pulp-cpython.csv",
+        "queens-pulp-pypy.csv",
+        "queens-gurobi-cpython.csv",
+        "queens-mip-cbc-pypy.csv",
+        "queens-mip-grb-pypy.csv",
+        "queens-mip-cbc-cpython.csv",
+        "queens-mip-grb-cpython.csv",
+    ]
 ]
 
 
@@ -29,11 +35,17 @@ if __name__ == "__main__":
     Ns = list(list(results.values())[0].keys())
     results.update(
         {
-            file[54:-4]: {N: 1000 * t for N, t in read_result(file).items()}
+            # strips the "queens-" prefix and the ".csv" extension
+            os.path.basename(file)[7:-4]: {
+                N: 1000 * t for N, t in read_result(file).items()
+            }
             for file in python_mip_benchmarks
+            if os.path.isfile(file)
         }
     )
-    results["jump-grb"] = read_result("/home/plaiseek/Softwares/python-mip/benchmarks/JuMP/result.csv")
+    jump_file = os.path.join(python_mip_results_dir, "queens-jump.csv")
+    if os.path.isfile(jump_file):
+        results["jump-grb"] = read_result(jump_file)
 
     cols = [
         "Gurobi_c",
@@ -46,27 +58,63 @@ if __name__ == "__main__":
         "jump-grb",
     ]
 
-    print(
-        """\\begin{table*}[!ht]
+    # skipped when the python-mip/JuMP result files are not on this machine
+    if all(c in results for c in cols):
+        print(
+            """\\begin{table*}[!ht]
   \\centering
-  \\begin{tabular}{c|rr|rr|r|r}
-    \multirow{2}{*}{N} & \\multicolumn{2}{c}{C} & \\multicolumn{2}{c}{MIP++} & GyrobiPy & \\multicolumn{2}{c}{Python-MIP} & \multirow{2}{*}{JuMP}\\tabularnewline
+  \\begin{tabular}{c|rr|rr|r|rr|r}
+    \multirow{2}{*}{N} & \\multicolumn{2}{c}{C} & \\multicolumn{2}{c}{MIP++} & GyrobiPy & \\multicolumn{2}{c}{Python-MIP} & \\multirow{2}{*}{JuMP}\\tabularnewline
     & naive & bulk & naive & bulk & CPython & CPython & Pypy &\\tabularnewline
-    \\hline
-"""
-    )
-    for N in Ns:
-        print(f"{N} & ", end="")
-        # print(" & ".join(map(lambda x: f"{results[x][N]:.2f}", cols)), end="")
-        ref = results[cols[0]][N]
-        print(f"{ref:.2f} ms & ", end="")
-        print(" & ".join(map(lambda x: f"{results[x][N]/ref:.1f} x", cols[1:])), end="")
-        print("\\tabularnewline")
-    print(
-        """
-  \\end{tabular}
+    \\hline"""
+        )
+        for N in Ns:
+            print(f"{N} & ", end="")
+            # print(" & ".join(map(lambda x: f"{results[x][N]:.2f}", cols)), end="")
+            ref = results[cols[0]][N]
+            print(f"{ref:.2f} ms & ", end="")
+            print(
+                " & ".join(map(lambda x: f"{results[x][N]/ref:.1f} x", cols[1:])),
+                end="",
+            )
+            print("\\tabularnewline")
+        print(
+            """  \\end{tabular}
 \\end{table*}"""
-    )
+        )
+
+    ortools_backends = [
+        b for b in ["Cbc", "SCIP", "Gurobi", "Highs"] if f"{b}_or_tools" in results
+    ]
+    if ortools_backends:
+        print(
+            """\\begin{table*}[!ht]
+  \\centering
+  \\begin{tabular}{c|"""
+            + "|".join(["rrr"] * len(ortools_backends))
+            + """}
+    \\multirow{2}{*}{N} & """
+            + " & ".join(
+                f"\\multicolumn{{3}}{{c}}{{{b}}}" for b in ortools_backends
+            )
+            + """\\tabularnewline
+    & """
+            + " & ".join(["MIP++ & bulk & OR-Tools"] * len(ortools_backends))
+            + """\\tabularnewline
+    \\hline"""
+        )
+        for N in Ns:
+            print(f"{N}", end="")
+            for b in ortools_backends:
+                ref = results[f"{b}_mippp"][N]
+                print(f" & {ref:.2f} ms", end="")
+                print(f" & {results[f'{b}_mippp_bulk'][N]/ref:.1f} x", end="")
+                print(f" & {results[f'{b}_or_tools'][N]/ref:.1f} x", end="")
+            print("\\tabularnewline")
+        print(
+            """  \\end{tabular}
+\\end{table*}"""
+        )
 
     cols = [
         "Cbc_mippp",
@@ -74,26 +122,30 @@ if __name__ == "__main__":
         "mip-cbc-cpython",
         "mip-cbc-pypy",
         "pulp-cpython",
+        "pulp-pypy",
     ]
 
-    print(
-        """\\begin{table*}[!ht]
+    # skipped when the python-mip result files are not on this machine
+    if all(c in results for c in cols):
+        print(
+            """\\begin{table*}[!ht]
   \\centering
-  \\begin{tabular}{c|rr|rr|r}
-    \multirow{2}{*}{N} & \\multicolumn{2}{c}{MIP++} & \\multicolumn{2}{c}{Python-MIP} & \multirow{2}{*}{PuLP}\\tabularnewline
-    & naive & bulk & CPython & Pypy &\\tabularnewline
-    \\hline
-"""
-    )
-    for N in Ns:
-        print(f"{N} & ", end="")
-        # print(" & ".join(map(lambda x: f"{results[x][N]:.2f}", cols)), end="")
-        ref = results[cols[0]][N]
-        print(f"{ref:.2f} ms & ", end="")
-        print(" & ".join(map(lambda x: f"{results[x][N]/ref:.1f} x", cols[1:])), end="")
-        print("\\tabularnewline")
-    print(
-        """
-  \\end{tabular}
+  \\begin{tabular}{c|rr|rr|rr}
+    \multirow{2}{*}{N} & \\multicolumn{2}{c}{MIP++} & \\multicolumn{2}{c}{Python-MIP} & \\multicolumn{2}{c}{PuLP}\\tabularnewline
+    & naive & bulk & CPython & Pypy & CPython & Pypy\\tabularnewline
+    \\hline"""
+        )
+        for N in Ns:
+            print(f"{N} & ", end="")
+            # print(" & ".join(map(lambda x: f"{results[x][N]:.2f}", cols)), end="")
+            ref = results[cols[0]][N]
+            print(f"{ref:.2f} ms & ", end="")
+            print(
+                " & ".join(map(lambda x: f"{results[x][N]/ref:.1f} x", cols[1:])),
+                end="",
+            )
+            print("\\tabularnewline")
+        print(
+            """  \\end{tabular}
 \\end{table*}"""
-    )
+        )

@@ -27,43 +27,65 @@ int main(int argc, char * argv[]) {
     GRBmodel * model = NULL;
     int error;
 
-    // Create environment
+    // Create empty model
     error = GRBloadenv(&env, NULL);
     checkGRBError(error, env);
-
-    // Create empty model
-    error =
-        GRBnewmodel(env, &model, "nqueens", 0, NULL, NULL, NULL, NULL, NULL);
+    error = GRBnewmodel(env, &model, "nqueens", 0,
+                        NULL, NULL, NULL, NULL, NULL);
     checkGRBError(error, env);
 
-    // Add N*N binary variables x[i][j] = 1 if queen in row i, column j
+    // Add N*N binary variables indexed as (col * N + row)
     const int num_variables = N * N;
-    char * vtype = (char *)malloc(sizeof(char) * num_variables);
+    char * vtype = 
+            (char *)malloc(sizeof(char) * num_variables);
     memset(vtype, GRB_BINARY, num_variables);
-
-    error = GRBaddvars(model, num_variables, 0, NULL, NULL, NULL, NULL, NULL,
-                       NULL, vtype, NULL);
+    error = GRBaddvars(model, num_variables, 0, NULL,
+                       NULL, NULL, NULL, NULL, NULL,
+                       vtype, NULL);
     checkGRBError(error, env);
 
-    // Constraints:
+    // C arrays to store linear expressions
     int * indices = (int *)malloc(sizeof(int) * N);
     double * coeffs = (double *)malloc(sizeof(double) * N);
 
-    // one queen per row and column
-    for(int i = 0; i < N; ++i) {
+    // One queen per row
+    for(int row = 0; row < N; ++row) {
         for(int col = 0; col < N; ++col) {
-            indices[col] = col * N + i;
+            indices[col] = col * N + row;
             coeffs[col] = 1.0;
         }
-        error = GRBaddconstr(model, N, indices, coeffs, GRB_EQUAL, 1.0, NULL);
-        checkGRBError(error, env);
-        for(int row = 0; row < N; ++row) {
-            indices[row] = i * N + row;
-            coeffs[row] = 1.0;
-        }
-        error = GRBaddconstr(model, N, indices, coeffs, GRB_EQUAL, 1.0, NULL);
+        error = GRBaddconstr(model, N, indices, coeffs,
+                             GRB_EQUAL, 1.0, NULL);
         checkGRBError(error, env);
     }
+    // One queen per column
+    for(int col = 0; col < N; ++col) {
+        for(int row = 0; row < N; ++row) {
+            indices[row] = col * N + row;
+            coeffs[row] = 1.0;
+        }
+        error = GRBaddconstr(model, N, indices, coeffs, 
+                             GRB_EQUAL, 1.0, NULL);
+        checkGRBError(error, env);
+    }
+
+
+    // // one queen per row
+    // for(int i = 0; i < N; ++i) {
+    //     for(int col = 0; col < N; ++col) {
+    //         indices[col] = col * N + i;
+    //         coeffs[col] = 1.0;
+    //     }
+    //     error = GRBaddconstr(model, N, indices, coeffs, GRB_EQUAL, 1.0, NULL);
+    //     checkGRBError(error, env);
+    //     // one queen per column
+    //     for(int row = 0; row < N; ++row) {
+    //         indices[row] = i * N + row;
+    //         coeffs[row] = 1.0;
+    //     }
+    //     error = GRBaddconstr(model, N, indices, coeffs, GRB_EQUAL, 1.0, NULL);
+    //     checkGRBError(error, env);
+    // }
     // one per upper diagonal \ //
     for(int top_col = 0; top_col < N - 1; ++top_col) {
         int idx = 0;
