@@ -35,7 +35,7 @@ Note that `MPSolver` stores the model in its own backend-independent data struct
 
 ## Reproducing the benchmarks
 
-The numbers above were obtained on an AMD Ryzen 7 7800X3D (Ubuntu 22.04, GCC 15.1), with every benchmark compiled with the same compiler and flags (`-std=c++26`, `Release`).
+The numbers above were obtained on an AMD Ryzen 7 7800X3D (Ubuntu 22.04, GCC 14.1), with every benchmark compiled with the same compiler and flags (`-std=c++23`, `Release`).
 
 ### Requirements
 
@@ -43,7 +43,7 @@ The numbers above were obtained on an AMD Ryzen 7 7800X3D (Ubuntu 22.04, GCC 15.
 - The [MIP++](https://github.com/fhamonic/mippp) Conan package (header-only, see below).
 - OR-Tools is fetched and built from source automatically by Conan (`or-tools/9.15` with statically linked Cbc, SCIP and HiGHS backends), so the OR-Tools benchmarks need no license and no pre-installed solver.
 - The `mippp`/`mippp_bulk` executables load the solvers' shared libraries at *runtime* (`dlopen`): install the ones you want to benchmark (Cbc, SCIP and HiGHS are free; Gurobi, CPLEX, MOSEK and COPT also require a license) and make them visible through `LD_LIBRARY_PATH`.
-- The `gurobi_c`/`gurobi_c_bulk` executables (Gurobi C API) link against the Gurobi SDK and are only built when it is found: point the `GUROBI_DIR` (and, for another Gurobi version, `GUROBI_LIB`) CMake cache variables in `CMakeLists.txt` to your installation. Without it these two benchmarks are skipped and everything else still builds.
+- The `gurobi_c`/`gurobi_c_bulk` executables (Gurobi C API) link against the Gurobi SDK and are only built when it is found: set the `GUROBI_HOME` environement variable to your installation, typically with `export GUROBI_HOME=".../gurobi1201/linux64"`.
 
 ### Building
 
@@ -74,26 +74,9 @@ make
 python3 scripts/benchmark_mippp.py
 python3 scripts/benchmark_ortools.py
 python3 scripts/benchmark_gurobi.py
-
-python3 scripts/benchmark_python.py
-python3 scripts/benchmark_jump.py
 ```
 
 ### Python and JuMP benchmarks
-
-The Python-MIP, PuLP and gurobipy numbers are produced by the benchmark scripts of the [python-mip repository](https://github.com/coin-or/python-mip) (the same ones behind the published [Python-MIP benchmark](https://python-mip.readthedocs.io/en/latest/bench.html)), included here as the git submodule `extern/python-mip`, pinned at the commit that was used and completed by the one-line warm-up patch `patches/python-mip-queens-warmup.patch`. The JuMP numbers are produced by `jump/n-queens.jl`. The result files used for the tables in this README are committed under `results/python-mip/`; to regenerate them:
-
-```sh
-git submodule update --init
-pip install mip pulp gurobipy timeout_decorator   # mip==1.15.0 was used here
-scripts/benchmark_python.sh
-```
-
-The runner applies the warm-up patch to the submodule if needed and skips every benchmark whose interpreter, library or solver license is unavailable:
-
-- the `*-pypy.csv` variants require `pypy3` with the `mip`, `pulp` and `timeout_decorator` packages installed;
-- the gurobipy and Python-MIP/Gurobi benchmarks require a licensed Gurobi installation;
-- the JuMP benchmark requires `julia` with the `JuMP` and `HiGHS` packages. As for the python benchmarks, a warm-up run is performed first so that the reported times exclude Julia's JIT compilation. Like OR-Tools' `MPSolver`, JuMP (in its default *cached* mode) builds the model in its own backend-independent representation, so its fill times exclude the actual solver load.
 
 | N | JuMP<br>Cbc | JuMP<br>HiGHS | Python-MIP<br>Cbc (CPython) | Python-MIP<br>Cbc (Pypy) | PuLP<br>Cbc (CPython) | PuLP<br>Cbc (Pypy) |
 |:---:|---:|---:|---:|---:|---:|---:|
@@ -107,3 +90,32 @@ The runner applies the warm-up patch to the submodule if needed and skips every 
 | 800 | 606.3 ms | 689.3 ms | 88.1 x | 3.1 x | 96.9 x | 5.7 x |
 | 900 | 802.8 ms | 759.6 ms | 94.9 x | 3.3 x | 104.7 x | 5.8 x |
 | 1000 | 994.5 ms | 956.7 ms | 107.1 x | 3.3 x | 116.0 x | 6.1 x |
+
+#### JuMP
+
+```julia
+julia> import Pkg
+julia> Pkg.add("JuMP")
+julia> Pkg.add("Cbc")
+julia> Pkg.add("HiGHS")
+```
+
+```sh
+python3 scripts/benchmark_jump.py
+```
+
+#### Python
+
+The Python-MIP, PuLP and gurobipy numbers are produced by the benchmark scripts of the [python-mip repository](https://github.com/coin-or/python-mip) (the same ones behind the published [Python-MIP benchmark](https://python-mip.readthedocs.io/en/latest/bench.html)), included here as the git submodule `extern/python-mip`, pinned at the commit that was used and completed by the one-line warm-up patch `patches/python-mip-queens-warmup.patch`. The JuMP numbers are produced by `jump/n-queens.jl`. The result files used for the tables in this README are committed under `results/python-mip/`; to regenerate them:
+
+```sh
+git submodule update --init
+pip install mip pulp gurobipy timeout_decorator   # mip==1.15.0 was used here
+./scripts/benchmark_python.sh
+```
+
+The runner applies the warm-up patch to the submodule if needed and skips every benchmark whose interpreter, library or solver license is unavailable:
+
+- the `*-pypy.csv` variants require `pypy3` with the `mip`, `pulp` and `timeout_decorator` packages installed;
+- the gurobipy and Python-MIP/Gurobi benchmarks require a licensed Gurobi installation;
+- the JuMP benchmark requires `julia` with the `JuMP` and `HiGHS` packages. As for the python benchmarks, a warm-up run is performed first so that the reported times exclude Julia's JIT compilation. Like OR-Tools' `MPSolver`, JuMP (in its default *cached* mode) builds the model in its own backend-independent representation, so its fill times exclude the actual solver load.
