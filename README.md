@@ -39,7 +39,7 @@ The numbers above were obtained on an AMD Ryzen 7 7800X3D (Ubuntu 22.04, GCC 15.
 
 ### Requirements
 
-- Linux, GCC >= 15 and [Conan](https://conan.io) >= 2.12 (the build uses the `CMakeConfigDeps` generator; CMake itself is provisioned by Conan).
+- Linux, GCC >= 14 and [Conan](https://conan.io) >= 2.12 (the build uses the `CMakeConfigDeps` generator; CMake itself is provisioned by Conan).
 - The [MIP++](https://github.com/fhamonic/mippp) Conan package (header-only, see below).
 - OR-Tools is fetched and built from source automatically by Conan (`or-tools/9.15` with statically linked Cbc, SCIP and HiGHS backends), so the OR-Tools benchmarks need no license and no pre-installed solver.
 - The `mippp`/`mippp_bulk` executables load the solvers' shared libraries at *runtime* (`dlopen`): install the ones you want to benchmark (Cbc, SCIP and HiGHS are free; Gurobi, CPLEX, MOSEK and COPT also require a license) and make them visible through `LD_LIBRARY_PATH`.
@@ -51,16 +51,12 @@ The numbers above were obtained on an AMD Ryzen 7 7800X3D (Ubuntu 22.04, GCC 15.
 git clone https://github.com/fhamonic/mippp_nqueens
 cd mippp_nqueens
 
-# 1. install the Conan profile (adjust CC/CXX inside to your GCC >= 15)
-cp profiles/gcc15_c++26 ~/.conan2/profiles/
-
-# 2. export the header-only MIP++ package into your Conan cache
+# 1. export the header-only MIP++ package into your Conan cache
 git clone https://github.com/fhamonic/mippp
-conan create mippp -pr=gcc15_c++26 -b=missing
+conan create mippp -pr=profiles/gcc14_c++23 -b=missing -c tools.build:skip_test=true
 
-# 3. build the benchmarks (the first run also builds or-tools and its
-#    dependency tree from source, which takes tens of minutes)
-make
+# 2. build the benchmarks (the first run also builds or-tools and its dependency tree from source, which takes tens of minutes)
+conan build . -of=build -pr=profiles/gcc14_c++23 -b=missing
 ```
 
 Known issue: `or-tools/9.15` pins `CXX_STANDARD 17` on a few auxiliary targets, which fails against the abseil version pinned by its recipe (it requires C++20). If the or-tools build fails on `fzn-parser_test`, patch the cached sources and re-run `make`:
@@ -75,13 +71,13 @@ make
 ### Running
 
 ```sh
-python3 scripts/benchmark.py   # writes one results/<Solver>_<api>.csv per benchmark
-python3 scripts/tables.py      # prints the LaTeX comparison tables
+python3 scripts/benchmark_mippp.py
+python3 scripts/benchmark_ortools.py
+python3 scripts/benchmark_gurobi.py
+
+python3 scripts/benchmark_python.py
+python3 scripts/benchmark_jump.py
 ```
-
-Edit the `solvers` and `ortools_solvers` lists at the top of `scripts/benchmark.py` to match the solvers available on your machine. Each row of a results file is `N,num_variables,num_constraints,fill_time_ms`. The comparison tables against the Python-MIP, PuLP, gurobipy and JuMP interfaces are only printed for the `results/python-mip/queens-*.csv` files that are present (see below).
-
-The executables can also be run individually, e.g. `./build/mippp SCIP 500`, `./build/or_tools Highs 1000` or `./build/gurobi_c 800`. They print their timings *in microseconds* on stderr (`solver,N,num_variables,num_constraints,api_time_us,fill_time_us` for `mippp*` and `or_tools`, the fill time only for `gurobi_c*`) and, for N < 20, also solve the instance and print the resulting board.
 
 ### Python and JuMP benchmarks
 

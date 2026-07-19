@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include <algorithm>
+#include <optional>
+#include <print>
 
 #include "gurobi_c.h"
 
@@ -9,17 +12,16 @@
 
 void checkGRBError(int error, GRBenv * env) {
     if(error) {
-        fprintf(stderr, "Gurobi Error: %s\n", GRBgeterrormsg(env));
-        exit(1);
+        std::println(stderr, "Gurobi Error: {}", GRBgeterrormsg(env));
+        exit(EXIT_FAILURE);
     }
 }
 
 int main(int argc, char * argv[]) {
     if(argc != 2) {
-        printf("Usage: %s N\n", argv[0]);
-        return 1;
+        std::print("Usage: {} N\n", argv[0]);
+        return EXIT_FAILURE;
     }
-
     int N = atoi(argv[1]);
 
     Chrono chrono;
@@ -92,22 +94,23 @@ int main(int argc, char * argv[]) {
     error = GRBupdatemodel(model);
     checkGRBError(error, env);
 
-    int fill_time_us = chrono.lapTimeUs();
+    const int model_time_us = chrono.lapTimeUs();
+    std::optional<int> solve_time_ms;
 
     if(N < 20) {
         error = GRBoptimize(model);
         checkGRBError(error, env);
+        const int solve_time_ms = chrono.lapTimeMs();
         double * sol = (double *)malloc(sizeof(double) * num_variables);
         error =
             GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, num_variables, sol);
         checkGRBError(error, env);
 
-        printf("Solution for %d-Queens:\n", N);
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
-                printf("%c ", sol[i * N + j] > 0.5 ? 'o' : '.');
+                std::print("{}", sol[i * N + j] > 0.5 ? '#' : '+');
             }
-            printf("\n");
+            std::println();
         }
         free(sol);
     }
@@ -122,7 +125,19 @@ int main(int argc, char * argv[]) {
     GRBfreemodel(model);
     GRBfreeenv(env);
 
-    fprintf(stderr, ",%d", fill_time_us);
+    std::print(stderr, R"({{
+    "solver_name" : "Gurobi",
+    "N" : {},
+    "num_variables" : {},
+    "num_constraints" : {},
+    "model_time_us" : {})",
+               N, num_variables, num_constraints, model_time_us);
+    if(solve_time_ms.has_value()) {
+        std::print(stderr, R"(,
+    "solve_time_ms" : {})",
+                   solve_time_ms.value());
+    }
+    std::println(stderr, "\n}}");
 
-    return 0;
+    return EXIT_SUCCESS;
 }

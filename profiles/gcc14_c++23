@@ -4,14 +4,14 @@
 arch=x86_64
 build_type=Release
 compiler=gcc
-compiler.cppstd=26
+compiler.cppstd=23
 compiler.libcxx=libstdc++11
-compiler.version=15
+compiler.version=14
 os=Linux
 
 [buildenv]
-CC=/opt/gcc-15/bin/gcc
-CXX=/opt/gcc-15/bin/g++
+CC=/usr/local/gcc-14.1.0/bin/gcc-14.1.0
+CXX=/usr/local/gcc-14.1.0/bin/g++-14.1.0
 # CPATH from ~/.bashrc (system solver installs) shadows conan -isystem includes
 CPATH=!
 
@@ -19,8 +19,6 @@ CPATH=!
 cmake/3.30.5
 
 [conf]
-# gcc15 defaults to C23 which rejects gmp's K&R-style configure tests
-gmp/*:tools.build:cflags=["-std=gnu17"]
 # prevent the system papilo (installed in /usr/local by scipoptsuite) from
 # being picked up by find_package in the soplex and scip builds
 soplex/*:tools.cmake.cmaketoolchain:extra_variables={"PAPILO": "OFF"}

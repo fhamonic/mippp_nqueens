@@ -1,4 +1,5 @@
 .vscode
 /build
-
+/mippp
+/results
 CMakeUserPresets.json

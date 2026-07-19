@@ -16,7 +16,6 @@ include(CompilerOptimizations)
 
 # ################### Targets #####################
 function(set_mippp_options _target)
-  target_include_directories(${_target} PUBLIC include)
   target_link_libraries(${_target} mippp::mippp)
   # target_compile_options(${_target} PUBLIC -ftime-report)
   set_project_optimizations(${_target})
@@ -37,7 +36,6 @@ set(GUROBI_LIB "gurobi120"
 
 if(EXISTS "${GUROBI_DIR}/include/gurobi_c.h")
   function(set_c_options _target)
-    target_include_directories(${_target} PUBLIC include)
     target_include_directories(${_target} PUBLIC "${GUROBI_DIR}/include")
     target_link_directories(${_target} PUBLIC "${GUROBI_DIR}/lib")
     target_link_libraries(${_target} ${GUROBI_LIB})

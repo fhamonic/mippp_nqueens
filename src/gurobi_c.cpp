@@ -1,6 +1,8 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <optional>
+#include <print>
 
 #include "gurobi_c.h"
 
@@ -8,17 +10,16 @@
 
 void checkGRBError(int error, GRBenv * env) {
     if(error) {
-        fprintf(stderr, "Gurobi Error: %s\n", GRBgeterrormsg(env));
-        exit(1);
+        std::println(stderr, "Gurobi Error: {}", GRBgeterrormsg(env));
+        exit(EXIT_FAILURE);
     }
 }
 
 int main(int argc, char * argv[]) {
     if(argc != 2) {
-        printf("Usage: %s N\n", argv[0]);
-        return 1;
+        std::print("Usage: {} N\n", argv[0]);
+        return EXIT_FAILURE;
     }
-
     int N = atoi(argv[1]);
 
     Chrono chrono;
@@ -30,18 +31,16 @@ int main(int argc, char * argv[]) {
     // Create empty model
     error = GRBloadenv(&env, NULL);
     checkGRBError(error, env);
-    error = GRBnewmodel(env, &model, "nqueens", 0,
-                        NULL, NULL, NULL, NULL, NULL);
+    error =
+        GRBnewmodel(env, &model, "nqueens", 0, NULL, NULL, NULL, NULL, NULL);
     checkGRBError(error, env);
 
     // Add N*N binary variables indexed as (col * N + row)
     const int num_variables = N * N;
-    char * vtype = 
-            (char *)malloc(sizeof(char) * num_variables);
+    char * vtype = (char *)malloc(sizeof(char) * num_variables);
     memset(vtype, GRB_BINARY, num_variables);
-    error = GRBaddvars(model, num_variables, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL,
-                       vtype, NULL);
+    error = GRBaddvars(model, num_variables, 0, NULL, NULL, NULL, NULL, NULL,
+                       NULL, vtype, NULL);
     checkGRBError(error, env);
 
     // C arrays to store linear expressions
@@ -54,8 +53,7 @@ int main(int argc, char * argv[]) {
             indices[col] = col * N + row;
             coeffs[col] = 1.0;
         }
-        error = GRBaddconstr(model, N, indices, coeffs,
-                             GRB_EQUAL, 1.0, NULL);
+        error = GRBaddconstr(model, N, indices, coeffs, GRB_EQUAL, 1.0, NULL);
         checkGRBError(error, env);
     }
     // One queen per column
@@ -64,28 +62,9 @@ int main(int argc, char * argv[]) {
             indices[row] = col * N + row;
             coeffs[row] = 1.0;
         }
-        error = GRBaddconstr(model, N, indices, coeffs, 
-                             GRB_EQUAL, 1.0, NULL);
+        error = GRBaddconstr(model, N, indices, coeffs, GRB_EQUAL, 1.0, NULL);
         checkGRBError(error, env);
     }
-
-
-    // // one queen per row
-    // for(int i = 0; i < N; ++i) {
-    //     for(int col = 0; col < N; ++col) {
-    //         indices[col] = col * N + i;
-    //         coeffs[col] = 1.0;
-    //     }
-    //     error = GRBaddconstr(model, N, indices, coeffs, GRB_EQUAL, 1.0, NULL);
-    //     checkGRBError(error, env);
-    //     // one queen per column
-    //     for(int row = 0; row < N; ++row) {
-    //         indices[row] = i * N + row;
-    //         coeffs[row] = 1.0;
-    //     }
-    //     error = GRBaddconstr(model, N, indices, coeffs, GRB_EQUAL, 1.0, NULL);
-    //     checkGRBError(error, env);
-    // }
     // one per upper diagonal \ //
     for(int top_col = 0; top_col < N - 1; ++top_col) {
         int idx = 0;
@@ -139,22 +118,27 @@ int main(int argc, char * argv[]) {
     error = GRBupdatemodel(model);
     checkGRBError(error, env);
 
-    int fill_time_us = chrono.lapTimeUs();
+    int num_constraints;
+    error = GRBgetintattr(model, GRB_INT_ATTR_NUMCONSTRS, &num_constraints);
+    checkGRBError(error, env);
+
+    const int model_time_us = chrono.lapTimeUs();
+    std::optional<int> solve_time_ms;
 
     if(N < 20) {
         error = GRBoptimize(model);
         checkGRBError(error, env);
+        const int solve_time_ms = chrono.lapTimeMs();
         double * sol = (double *)malloc(sizeof(double) * num_variables);
         error =
             GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, num_variables, sol);
         checkGRBError(error, env);
 
-        printf("Solution for %d-Queens:\n", N);
         for(int i = 0; i < N; i++) {
             for(int j = 0; j < N; j++) {
-                printf("%c ", sol[i * N + j] > 0.5 ? 'o' : '.');
+                std::print("{}", sol[i * N + j] > 0.5 ? '#' : '+');
             }
-            printf("\n");
+            std::println();
         }
         free(sol);
     }
@@ -165,7 +149,19 @@ int main(int argc, char * argv[]) {
     GRBfreemodel(model);
     GRBfreeenv(env);
 
-    fprintf(stderr, ",%d", fill_time_us);
+    std::print(stderr, R"({{
+    "solver_name" : "Gurobi",
+    "N" : {},
+    "num_variables" : {},
+    "num_constraints" : {},
+    "model_time_us" : {})",
+               N, num_variables, num_constraints, model_time_us);
+    if(solve_time_ms.has_value()) {
+        std::print(stderr, R"(,
+    "solve_time_ms" : {})",
+                   solve_time_ms.value());
+    }
+    std::println(stderr, "\n}}");
 
-    return 0;
+    return EXIT_SUCCESS;
 }
