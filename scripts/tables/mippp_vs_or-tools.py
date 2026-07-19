@@ -35,12 +35,12 @@ table_data = [
             ),
             (
                 "HiGHS",
-                read_col("results/mippp/Highs_mippp_bulk.csv", "model_time_us"),
+                read_col("results/mippp/Highs_mippp.csv", "model_time_us"),
                 to_float,
             ),
             (
                 "SCIP",
-                read_col("results/mippp/SCIP_mippp_bulk.csv", "model_time_us"),
+                read_col("results/mippp/SCIP_mippp.csv", "model_time_us"),
                 to_float,
             ),
         ],

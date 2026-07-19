@@ -30,7 +30,7 @@ table_data = [
             ),
             (
                 "HiGHS",
-                read_col("results/mippp/Highs_mippp_bulk.csv", "model_time_us"),
+                read_col("results/mippp/Highs_mippp.csv", "model_time_us"),
                 to_float,
             ),
         ],
