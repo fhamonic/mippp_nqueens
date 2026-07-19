@@ -1,35 +1,35 @@
 The following table contains the time *in Milliseconds* requires by mippp to fill a N-Queens MILP model for each of the popular solvers supported.
 These results are to be compared with the [Python-MIP benchmarks](https://python-mip.readthedocs.io/en/latest/bench.html#) of python interfaces.
 
-| N    | Cbc  | CPLEX | Gurobi | Highs | MOSEK | SCIP  |
-|------|------|-------|--------|-------|-------|-------|
-| 100  | 1    | 1.2   | 3.6    | 1.1   | 2     | 15.7  |
-| 200  | 6.7  | 4.7   | 7.8    | 4.3   | 4.4   | 26.3  |
-| 300  | 8.4  | 9.9   | 14.7   | 10    | 7.7   | 57.5  |
-| 400  | 15.4 | 18.9  | 24.7   | 18.6  | 14.9  | 98.3  |
-| 500  | 29.9 | 29.4  | 36.2   | 31    | 21.2  | 152.2 |
-| 600  | 30.8 | 44.8  | 53.7   | 45.2  | 31.7  | 222.3 |
-| 700  | 43   | 63.1  | 70.8   | 64.7  | 48.7  | 305.2 |
-| 800  | 72.5 | 86    | 92.7   | 92.2  | 57.9  | 404.6 |
-| 900  | 92   | 106.2 | 120.8  | 116.9 | 69.4  | 523.2 |
-| 1000 | 94.9 | 129.2 | 149.8  | 129.2 | 85.5  | 641.8 |
+| N | MIP++<br>Cbc | MIP++<br>HiGHS | OR-tools<br>Cbc | OR-tools<br>HiGHS | JuMP<br>Cbc | JuMP<br>HiGHS |
+|:---:|---:|---:|---:|---:|---:|---:|
+| 100 | 0.9 ms | 1.2 ms | 3.8 x | 3.0 x | 13.7 x | 57.0 x |
+| 200 | 3.3 ms | 5.1 ms | 4.1 x | 2.7 x | 30.4 x | 5.3 x |
+| 300 | 7.0 ms | 11.5 ms | 4.5 x | 2.7 x | 10.6 x | 9.6 x |
+| 400 | 12.3 ms | 21.1 ms | 4.4 x | 2.6 x | 15.2 x | 8.3 x |
+| 500 | 18.6 ms | 35.0 ms | 4.9 x | 2.6 x | 13.9 x | 7.7 x |
+| 600 | 28.2 ms | 49.8 ms | 4.6 x | 2.6 x | 12.4 x | 7.3 x |
+| 700 | 37.7 ms | 67.3 ms | 4.7 x | 2.6 x | 14.8 x | 6.7 x |
+| 800 | 47.9 ms | 100.2 ms | 4.7 x | 2.3 x | 12.7 x | 6.9 x |
+| 900 | 60.1 ms | 124.8 ms | 5.1 x | 2.5 x | 13.4 x | 6.1 x |
+| 1000 | 73.7 ms | 145.5 ms | 5.2 x | 2.6 x | 13.5 x | 6.6 x |
 
 ## MIP++ vs OR-Tools
 
 The following table compares the time *in Milliseconds* required to fill the same N-Queens MILP model (N² binary variables, 6N-6 constraints) through MIP++ and through the OR-Tools `MPSolver` C++ API (`or-tools/9.15`), for the solvers supported by both.
 
-| N    | Cbc MIP++ | Cbc OR-Tools | SCIP MIP++ | SCIP OR-Tools | Highs MIP++ | Highs OR-Tools |
-|------|-----------|--------------|------------|---------------|-------------|----------------|
-| 100  | 8.2       | 4.2          | 12.2       | 5.6           | 2.0         | 4.0            |
-| 200  | 13.0      | 15.0         | 30.3       | 16.2          | 5.6         | 14.3           |
-| 300  | 13.2      | 31.9         | 60.0       | 35.2          | 12.2        | 33.0           |
-| 400  | 19.1      | 54.9         | 111.5      | 58.2          | 23.4        | 57.5           |
-| 500  | 25.2      | 94.2         | 157.5      | 93.0          | 36.4        | 93.2           |
-| 600  | 33.7      | 135.2        | 225.3      | 140.2         | 49.8        | 132.6          |
-| 700  | 43.5      | 177.5        | 307.1      | 189.1         | 69.7        | 181.4          |
-| 800  | 52.8      | 236.0        | 399.6      | 239.7         | 101.2       | 235.3          |
-| 900  | 66.9      | 317.6        | 509.6      | 328.5         | 126.2       | 313.6          |
-| 1000 | 78.1      | 401.6        | 638.6      | 406.4         | 148.0       | 396.0          |
+| N | MIP++<br>Cbc | MIP++<br>HiGHS | MIP++<br>SCIP | OR-tools<br>Cbc | OR-tools<br>HiGHS | OR-tools<br>SCIP |
+|:---:|---:|---:|---:|---:|---:|---:|
+| 100 | 0.9 ms | 1.2 ms | 8.3 ms | 3.8 x | 3.0 x | 0.4 x |
+| 200 | 3.3 ms | 5.1 ms | 27.8 ms | 4.1 x | 2.7 x | 0.5 x |
+| 300 | 7.0 ms | 11.5 ms | 61.0 ms | 4.5 x | 2.7 x | 0.5 x |
+| 400 | 12.3 ms | 21.1 ms | 96.1 ms | 4.4 x | 2.6 x | 0.6 x |
+| 500 | 18.6 ms | 35.0 ms | 149.1 ms | 4.9 x | 2.6 x | 0.6 x |
+| 600 | 28.2 ms | 49.8 ms | 222.7 ms | 4.6 x | 2.6 x | 0.6 x |
+| 700 | 37.7 ms | 67.3 ms | 310.6 ms | 4.7 x | 2.6 x | 0.6 x |
+| 800 | 47.9 ms | 100.2 ms | 424.8 ms | 4.7 x | 2.3 x | 0.5 x |
+| 900 | 60.1 ms | 124.8 ms | 538.9 ms | 5.1 x | 2.5 x | 0.6 x |
+| 1000 | 73.7 ms | 145.5 ms | 690.2 ms | 5.2 x | 2.6 x | 0.6 x |
 
 Note that `MPSolver` stores the model in its own backend-independent data structures and only extracts it to the underlying solver when `Solve()` is called, which is why its fill times are nearly identical for all backends and exclude the actual solver load. The MIP++ (and Gurobi C API) timings instead include building the model in the solver's native in-memory representation. The OR-Tools `Gurobi` backend is also supported by `src/or_tools.cpp` but requires a valid Gurobi license at runtime.
 
@@ -86,7 +86,7 @@ The Python-MIP, PuLP and gurobipy numbers are produced by the benchmark scripts 
 ```sh
 git submodule update --init
 pip install mip pulp gurobipy timeout_decorator   # mip==1.15.0 was used here
-scripts/benchmark_python.sh   # writes results/python-mip/queens-*.csv
+scripts/benchmark_python.sh
 ```
 
 The runner applies the warm-up patch to the submodule if needed and skips every benchmark whose interpreter, library or solver license is unavailable:
@@ -94,3 +94,16 @@ The runner applies the warm-up patch to the submodule if needed and skips every 
 - the `*-pypy.csv` variants require `pypy3` with the `mip`, `pulp` and `timeout_decorator` packages installed;
 - the gurobipy and Python-MIP/Gurobi benchmarks require a licensed Gurobi installation;
 - the JuMP benchmark requires `julia` with the `JuMP` and `HiGHS` packages. As for the python benchmarks, a warm-up run is performed first so that the reported times exclude Julia's JIT compilation. Like OR-Tools' `MPSolver`, JuMP (in its default *cached* mode) builds the model in its own backend-independent representation, so its fill times exclude the actual solver load.
+
+| N | JuMP<br>Cbc | JuMP<br>HiGHS | Python-MIP<br>Cbc (CPython) | Python-MIP<br>Cbc (Pypy) | PuLP<br>Cbc (CPython) | PuLP<br>Cbc (Pypy) |
+|:---:|---:|---:|---:|---:|---:|---:|
+| 100 | 13.0 ms | 66.6 ms | 12.3 x | 12.1 x | 10.6 x | 5.4 x |
+| 200 | 99.8 ms | 26.7 ms | 8.1 x | 0.9 x | 9.2 x | 1.7 x |
+| 300 | 74.1 ms | 111.0 ms | 36.9 x | 2.7 x | 40.0 x | 4.9 x |
+| 400 | 187.0 ms | 174.4 ms | 36.2 x | 2.1 x | 39.3 x | 3.6 x |
+| 500 | 257.9 ms | 270.7 ms | 50.7 x | 2.3 x | 54.5 x | 4.4 x |
+| 600 | 348.6 ms | 365.0 ms | 64.1 x | 2.6 x | 70.1 x | 5.1 x |
+| 700 | 558.7 ms | 450.9 ms | 64.8 x | 2.3 x | 70.3 x | 4.5 x |
+| 800 | 606.3 ms | 689.3 ms | 88.1 x | 3.1 x | 96.9 x | 5.7 x |
+| 900 | 802.8 ms | 759.6 ms | 94.9 x | 3.3 x | 104.7 x | 5.8 x |
+| 1000 | 994.5 ms | 956.7 ms | 107.1 x | 3.3 x | 116.0 x | 6.1 x |

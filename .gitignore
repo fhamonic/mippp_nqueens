@@ -3,3 +3,7 @@
 /mippp
 /results
 CMakeUserPresets.json
+
+queens-mip-cbc.csv
+gurobipy.csv
+queens-pulp.csv
