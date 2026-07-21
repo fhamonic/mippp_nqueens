@@ -25,12 +25,12 @@ table_data = [
         [
             (
                 "Cbc",
-                read_col("results/mippp/Cbc_mippp.csv", "model_time_us"),
+                read_col("results/mippp/Cbc_mippp_bulk.csv", "model_time_us"),
                 to_float,
             ),
             (
                 "HiGHS",
-                read_col("results/mippp/Highs_mippp.csv", "model_time_us"),
+                read_col("results/mippp/Highs_mippp_bulk.csv", "model_time_us"),
                 to_float,
             ),
         ],
@@ -40,12 +40,12 @@ table_data = [
         [
             (
                 "Cbc",
-                read_col("results/or_tools/Cbc_or_tools.csv", "model_time_us"),
+                read_col("results/or_tools/Cbc.csv", "model_time_us"),
                 to_cbc_scale,
             ),
             (
                 "HiGHS",
-                read_col("results/or_tools/Highs_or_tools.csv", "model_time_us"),
+                read_col("results/or_tools/Highs.csv", "model_time_us"),
                 to_highs_scale,
             ),
         ],
@@ -55,12 +55,12 @@ table_data = [
         [
             (
                 "Cbc",
-                read_col("results/jump/Cbc_jump.csv", "model_time_us"),
+                read_col("results/jump/Cbc.csv", "model_time_us"),
                 to_cbc_scale,
             ),
             (
                 "HiGHS",
-                read_col("results/jump/Highs_jump.csv", "model_time_us"),
+                read_col("results/jump/Highs.csv", "model_time_us"),
                 to_highs_scale,
             ),
         ],

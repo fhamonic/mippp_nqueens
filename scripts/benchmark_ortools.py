@@ -26,7 +26,7 @@ def to_row(results: list):
 results_dir = "results/or_tools"
 os.makedirs(results_dir, exist_ok=True)
 for solver in ["Cbc", "SCIP", "GLPK", "Gurobi", "Highs"]:
-    csv_path = f"{results_dir}/{solver}_or_tools.csv"
+    csv_path = f"{results_dir}/{solver}.csv"
     if os.path.exists(csv_path):
         continue
     try:

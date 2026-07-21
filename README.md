@@ -13,16 +13,16 @@ same machine.
 
 | N | MIP++<br>Cbc | MIP++<br>HiGHS | OR-tools<br>Cbc | OR-tools<br>HiGHS | JuMP<br>Cbc | JuMP<br>HiGHS |
 |:---:|---:|---:|---:|---:|---:|---:|
-| 100 | 0.9 ms | 1.5 ms | 4.0 x | 2.3 x | 14.3 x | 43.9 x |
-| 200 | 3.2 ms | 5.9 ms | 4.2 x | 2.3 x | 30.8 x | 4.5 x |
-| 300 | 6.8 ms | 14.2 ms | 4.6 x | 2.2 x | 10.8 x | 7.8 x |
-| 400 | 12.2 ms | 23.4 ms | 4.4 x | 2.3 x | 15.4 x | 7.4 x |
-| 500 | 18.9 ms | 36.6 ms | 4.8 x | 2.4 x | 13.6 x | 7.4 x |
-| 600 | 27.6 ms | 57.7 ms | 4.7 x | 2.3 x | 12.7 x | 6.3 x |
-| 700 | 37.2 ms | 75.9 ms | 4.7 x | 2.3 x | 15.0 x | 5.9 x |
-| 800 | 48.7 ms | 102.1 ms | 4.7 x | 2.3 x | 12.4 x | 6.8 x |
-| 900 | 61.8 ms | 124.6 ms | 5.0 x | 2.5 x | 13.0 x | 6.1 x |
-| 1000 | 72.8 ms | 146.2 ms | 5.2 x | 2.6 x | 13.7 x | 6.5 x |
+| 100 | 1.0 ms | 1.2 ms | 3.7 x | 3.0 x | 11.8 x | 59.7 x |
+| 200 | 3.4 ms | 5.0 ms | 4.1 x | 2.7 x | 29.4 x | 5.4 x |
+| 300 | 7.1 ms | 11.8 ms | 4.5 x | 2.7 x | 10.3 x | 10.3 x |
+| 400 | 12.4 ms | 21.1 ms | 4.4 x | 2.6 x | 15.0 x | 8.3 x |
+| 500 | 19.6 ms | 36.8 ms | 4.6 x | 2.5 x | 13.4 x | 7.2 x |
+| 600 | 27.6 ms | 50.1 ms | 4.8 x | 2.6 x | 12.7 x | 7.1 x |
+| 700 | 39.3 ms | 67.5 ms | 4.6 x | 2.6 x | 14.4 x | 6.8 x |
+| 800 | 49.0 ms | 100.5 ms | 4.7 x | 2.3 x | 12.4 x | 6.9 x |
+| 900 | 62.2 ms | 127.3 ms | 5.1 x | 2.5 x | 12.8 x | 6.1 x |
+| 1000 | 73.3 ms | 147.7 ms | 5.2 x | 2.6 x | 14.0 x | 6.4 x |
 
 Cbc is the one backend common to all the interfaces compared here, and HiGHS is
 shared by MIP++, OR-Tools and JuMP, which is why the tables use them. The
@@ -54,16 +54,16 @@ API (`or-tools/9.15`), for the solvers supported by both.
 
 | N | MIP++<br>Cbc | MIP++<br>HiGHS | MIP++<br>SCIP | OR-tools<br>Cbc | OR-tools<br>HiGHS | OR-tools<br>SCIP |
 |:---:|---:|---:|---:|---:|---:|---:|
-| 100 | 0.9 ms | 1.5 ms | 8.3 ms | 4.0 x | 2.3 x | 0.4 x |
-| 200 | 3.2 ms | 5.9 ms | 27.2 ms | 4.2 x | 2.3 x | 0.5 x |
-| 300 | 6.8 ms | 14.2 ms | 59.9 ms | 4.6 x | 2.2 x | 0.5 x |
-| 400 | 12.2 ms | 23.4 ms | 96.4 ms | 4.4 x | 2.3 x | 0.6 x |
-| 500 | 18.9 ms | 36.6 ms | 146.7 ms | 4.8 x | 2.4 x | 0.6 x |
-| 600 | 27.6 ms | 57.7 ms | 217.7 ms | 4.7 x | 2.3 x | 0.6 x |
-| 700 | 37.2 ms | 75.9 ms | 306.0 ms | 4.7 x | 2.3 x | 0.6 x |
-| 800 | 48.7 ms | 102.1 ms | 411.7 ms | 4.7 x | 2.3 x | 0.6 x |
-| 900 | 61.8 ms | 124.6 ms | 534.4 ms | 5.0 x | 2.5 x | 0.6 x |
-| 1000 | 72.8 ms | 146.2 ms | 661.3 ms | 5.2 x | 2.6 x | 0.6 x |
+| 100 | 1.0 ms | 1.2 ms | 8.3 ms | 3.7 x | 3.0 x | 0.4 x |
+| 200 | 3.4 ms | 5.0 ms | 27.1 ms | 4.1 x | 2.7 x | 0.5 x |
+| 300 | 7.1 ms | 11.8 ms | 60.8 ms | 4.5 x | 2.7 x | 0.5 x |
+| 400 | 12.4 ms | 21.1 ms | 96.1 ms | 4.4 x | 2.6 x | 0.6 x |
+| 500 | 19.6 ms | 36.8 ms | 144.4 ms | 4.6 x | 2.5 x | 0.6 x |
+| 600 | 27.6 ms | 50.1 ms | 223.5 ms | 4.8 x | 2.6 x | 0.6 x |
+| 700 | 39.3 ms | 67.5 ms | 303.3 ms | 4.6 x | 2.6 x | 0.6 x |
+| 800 | 49.0 ms | 100.5 ms | 417.0 ms | 4.7 x | 2.3 x | 0.6 x |
+| 900 | 62.2 ms | 127.3 ms | 531.3 ms | 5.1 x | 2.5 x | 0.6 x |
+| 1000 | 73.3 ms | 147.7 ms | 653.7 ms | 5.2 x | 2.6 x | 0.6 x |
 
 Note that `MPSolver` stores the model in its own backend-independent data structures and only extracts it to the underlying solver when `Solve()` is called, which is why its fill times are nearly identical for all backends and exclude the actual solver load. The MIP++ (and Gurobi C API) timings instead include building the model in the solver's native in-memory representation. The OR-Tools `Gurobi` backend is also supported by `src/or_tools.cpp` but requires a valid Gurobi license at runtime.
 
@@ -147,18 +147,18 @@ benchmarks must have been run first.
 
 ### Python and JuMP benchmarks
 
-| N | JuMP<br>Cbc | JuMP<br>HiGHS | Python-MIP<br>Cbc (CPython) | Python-MIP<br>Cbc (Pypy) | PuLP<br>Cbc (CPython) | PuLP<br>Cbc (Pypy) |
+| N | JuMP<br>Cbc (warm) | JuMP<br>Cbc (cold) | Python-MIP<br>Cbc (CPython) | Python-MIP<br>Cbc (Pypy) | PuLP<br>Cbc (CPython) | PuLP<br>Cbc (Pypy) |
 |:---:|---:|---:|---:|---:|---:|---:|
-| 100 | 13.0 ms | 66.6 ms | 12.3 x | 12.1 x | 10.6 x | 5.4 x |
-| 200 | 99.8 ms | 26.7 ms | 8.1 x | 0.9 x | 9.2 x | 1.7 x |
-| 300 | 74.1 ms | 111.0 ms | 36.9 x | 2.7 x | 40.0 x | 4.9 x |
-| 400 | 187.0 ms | 174.4 ms | 36.2 x | 2.1 x | 39.3 x | 3.6 x |
-| 500 | 257.9 ms | 270.7 ms | 50.7 x | 2.3 x | 54.5 x | 4.4 x |
-| 600 | 348.6 ms | 365.0 ms | 64.1 x | 2.6 x | 70.1 x | 5.1 x |
-| 700 | 558.7 ms | 450.9 ms | 64.8 x | 2.3 x | 70.3 x | 4.5 x |
-| 800 | 606.3 ms | 689.3 ms | 88.1 x | 3.1 x | 96.9 x | 5.7 x |
-| 900 | 802.8 ms | 759.6 ms | 94.9 x | 3.3 x | 104.7 x | 5.8 x |
-| 1000 | 994.5 ms | 956.7 ms | 107.1 x | 3.3 x | 116.0 x | 6.1 x |
+| 100 | 11.5 ms | 219.7 x | 14.0 x | 13.8 x | 12.0 x | 6.2 x |
+| 200 | 98.7 ms | 25.8 x | 8.2 x | 0.9 x | 9.3 x | 1.8 x |
+| 300 | 73.8 ms | 36.3 x | 37.1 x | 2.7 x | 40.2 x | 4.9 x |
+| 400 | 185.8 ms | 14.8 x | 36.4 x | 2.1 x | 39.5 x | 3.6 x |
+| 500 | 262.4 ms | 10.7 x | 49.8 x | 2.2 x | 53.5 x | 4.3 x |
+| 600 | 349.7 ms | 8.5 x | 63.9 x | 2.6 x | 69.8 x | 5.1 x |
+| 700 | 565.7 ms | 5.4 x | 64.0 x | 2.3 x | 69.4 x | 4.4 x |
+| 800 | 607.3 ms | 5.4 x | 87.9 x | 3.1 x | 96.8 x | 5.7 x |
+| 900 | 793.8 ms | 4.4 x | 95.9 x | 3.3 x | 105.9 x | 5.8 x |
+| 1000 | 1029.0 ms | 3.5 x | 103.5 x | 3.2 x | 112.1 x | 5.9 x |
 
 #### JuMP
 

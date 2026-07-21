@@ -14,24 +14,19 @@ def to_us_cbc_scale(N, value):
     return to_cbc_scale(N, float(value) * 1_000_000)
 
 
-def to_highs_scale(N, value):
-    ref_value = table_data[0][1][1][1][N]
-    return "{:.1f} x".format(float(value) / float(ref_value))
-
-
 table_data = [
     (
         "JuMP",
         [
             (
-                "Cbc",
-                read_col("results/jump/Cbc_jump.csv", "model_time_us"),
+                "Cbc (warm)",
+                read_col("results/jump/Cbc.csv", "model_time_us"),
                 to_float,
             ),
             (
-                "HiGHS",
-                read_col("results/jump/Highs_jump.csv", "model_time_us"),
-                to_float,
+                "Cbc (cold)",
+                read_col("results/jump/Cbc.csv", "cold_model_time_us"),
+                to_cbc_scale,
             ),
         ],
     ),
