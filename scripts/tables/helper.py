@@ -45,7 +45,7 @@ def print_markdown_table(table_data):
         (
             group
             if (len([x for x in cols if x[0] == group]) == 1 and sc[0] == "")
-            else f"{group}<br>{sc[0]}"
+            else f"<div align=\"center\">{group}<br>{sc[0]}</div>"
         )
         for group, sc in cols
     ]

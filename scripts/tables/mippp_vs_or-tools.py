@@ -5,7 +5,7 @@ def to_float(N, value):
     return "{:.1f} ms".format(float(value) / 1_000)
 
 
-def to_cbc_scale(N, value):
+def to_first_scale(N, value):
     ref_value = table_data[0][1][0][1][N]
     return "{:.1f} x".format(float(value) / float(ref_value))
 
@@ -47,7 +47,7 @@ table_data = [
             (
                 "Cbc",
                 read_col("results/or_tools/Cbc.csv", "model_time_us"),
-                to_cbc_scale,
+                to_first_scale,
             ),
             (
                 "HiGHS",

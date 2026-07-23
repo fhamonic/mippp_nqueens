@@ -27,7 +27,7 @@ os.makedirs(results_dir, exist_ok=True)
 
 
 for exec_name in ["gurobi_c", "gurobi_c_bulk"]:
-    csv_path = f"{results_dir}/gurobi.csv"
+    csv_path = f"{results_dir}/{exec_name}.csv"
     if os.path.exists(csv_path):
         exit(1)
     try:
@@ -36,4 +36,4 @@ for exec_name in ["gurobi_c", "gurobi_c_bulk"]:
     except Exception as e:
         print(f"Skipped: {resume_exception(e)}")
         exit(1)
-    print(f"Done!")
+    print(f"{exec_name} Done!")

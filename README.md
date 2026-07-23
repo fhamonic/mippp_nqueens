@@ -196,3 +196,19 @@ The runner writes `results/python-mip/`, `results/pulp/` and `results/gurobipy.c
 
 - the `*_pypy.csv` variants require `pypy3` with the `mip`, `pulp` and `timeout_decorator` packages installed;
 - the gurobipy and Python-MIP/Gurobi benchmarks require a licensed Gurobi installation.
+
+
+### Gurobi C API vs others
+
+| N | pure C API | MIP++ | <div align="center">JuMP<br>(cold)</div> | <div align="center">JuMP<br>(warm)</div> | <div align="center">Python-MIP<br>CPython</div> | <div align="center">Python-MIP<br>Pypy</div> | GurobiPy |
+|:---:|---:|---:|---:|---:|---:|---:|---:|
+| 100 | 3.2 ms | 97.6 % | 147.2 x | 3.8 x | 45.3 x | 40.7 x | 34.8 x |
+| 200 | 8.4 ms | 101.8 % | 59.6 x | 3.7 x | 95.2 x | 9.8 x | 89.6 x |
+| 300 | 16.9 ms | 102.9 % | 32.0 x | 6.7 x | 162.3 x | 10.0 x | 152.7 x |
+| 400 | 28.8 ms | 102.9 % | 22.1 x | 5.9 x | 233.7 x | 11.8 x | 217.4 x |
+| 500 | 44.4 ms | 103.6 % | 15.7 x | 7.6 x | 284.4 x | 13.3 x | 284.9 x |
+| 600 | 64.6 ms | 104.3 % | 13.3 x | 6.3 x | 341.5 x | 14.3 x | 342.2 x |
+| 700 | 89.0 ms | 104.3 % | 11.7 x | 5.1 x | 398.9 x | 15.4 x | 389.6 x |
+| 800 | 116.6 ms | 106.6 % | 10.2 x | 5.9 x | 460.8 x | 17.1 x | 449.9 x |
+| 900 | 148.7 ms | 106.2 % | 9.5 x | 5.2 x | 508.5 x | 18.4 x | 501.4 x |
+| 1000 | 183.8 ms | 103.1 % | 8.4 x | 5.6 x | 574.9 x | 20.3 x | 562.5 x |

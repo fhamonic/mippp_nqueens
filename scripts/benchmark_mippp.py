@@ -48,4 +48,4 @@ for exec_name in ["mippp", "mippp_bulk"]:
         except Exception as e:
             print(f"Skipped {exec_name} {solver}: {resume_exception(e)}")
             continue
-        print(f"Done {exec_name} {solver}!")
+        print(f"{exec_name} {solver} Done!")

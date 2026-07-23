@@ -35,4 +35,4 @@ for solver in ["Cbc", "SCIP", "GLPK", "Gurobi", "Highs"]:
     except Exception as e:
         print(f"Skipped {solver}: {resume_exception(e)}")
         continue
-    print(f"Done {solver}!")
+    print(f"{solver} Done!")
