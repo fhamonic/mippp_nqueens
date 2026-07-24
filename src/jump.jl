@@ -48,14 +48,14 @@ end
 cold_model_time = @elapsed model = build_model(N, OPTIMIZER)
 warm_model_time = @elapsed model = build_model(N, OPTIMIZER)
 
-as_microseconds(t) = round(Int, t * 1e6)
+as_milliseconds(t) = round(Int, t * 1e3)
 
 println(stderr,
     """{"solver_name":"$(solver_name(model))",""" *
     """"N":$(N),""" *
     """"num_variables":$(num_variables(model)),""" *
     """"num_constraints":$(num_constraints(model; count_variable_in_set_constraints = false)),""" *
-    """"api_time_us":$(as_microseconds(api_time)),""" *
-    """"cold_model_time_us":$(as_microseconds(cold_model_time)),""" *
-    """"model_time_us":$(as_microseconds(warm_model_time))}"""
+    """"api_time_ms":$(as_milliseconds(api_time)),""" *
+    """"cold_model_time_ms":$(as_milliseconds(cold_model_time)),""" *
+    """"model_time_ms":$(as_milliseconds(warm_model_time))}"""
 )

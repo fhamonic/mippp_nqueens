@@ -38,7 +38,7 @@ int run(const std::string & solver_id, const int N) {
         std::println(stderr, "Solver unavailable.");
         return EXIT_FAILURE;
     }
-    const int api_time_us = chrono.lapTimeUs();
+    const int api_time_ms = chrono.lapTimeMs();
 
     // x[row][col] == 1 iff a queen is placed on the square (row, col)
     std::vector<std::vector<const MPVariable *>> x(
@@ -92,7 +92,7 @@ int run(const std::string & solver_id, const int N) {
     const auto num_variables = solver->NumVariables();
     const auto num_constraints = solver->NumConstraints();
 
-    const int model_time_us = chrono.lapTimeUs();
+    const int model_time_ms = chrono.lapTimeMs();
     std::optional<int> solve_time_ms;
 
     if(N < 20) {
@@ -116,10 +116,10 @@ int run(const std::string & solver_id, const int N) {
     "N" : {},
     "num_variables" : {},
     "num_constraints" : {},
-    "api_time_us" : {},
-    "model_time_us" : {})",
-               solver_id, N, num_variables, num_constraints, api_time_us,
-               model_time_us);
+    "api_time_ms" : {},
+    "model_time_ms" : {})",
+               solver_id, N, num_variables, num_constraints, api_time_ms,
+               model_time_ms);
     if(solve_time_ms.has_value()) {
         std::print(stderr, R"(,
     "solve_time_ms" : {})",

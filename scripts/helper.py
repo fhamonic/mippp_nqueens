@@ -13,9 +13,12 @@ def call_executable(cmd):
             text=True,
             check=True,
         )
-        return json.loads(process.stderr.strip())
+        # Strip stderr befor json
+        result = process.stderr.strip()
+        result = result[result.find("{") :]
+        return json.loads(result)
     except subprocess.CalledProcessError as e:
-        raise Exception(e.stderr.strip() + '\n' + str(e))
+        raise Exception(e.stderr.strip() + "\n" + str(e))
 
 
 def run(
@@ -25,17 +28,22 @@ def run(
     to_row: Callable,
     csv_path: str,
 ):
-    rows = []
-    for args in args_list:
-        reps = repetitions(args)
-        runs = []
-        for i in range(reps):
-            cmd = cmd_f(args)
-            print(
-                "\r" + " " * 80 + "\r> " + " ".join(cmd) + f"\t({i+1}/{reps})", end="\r"
-            )
-            runs.append(call_executable(cmd))
-        rows.append(to_row(runs))
+    try:
+        rows = []
+        for args in args_list:
+            reps = repetitions(args)
+            runs = []
+            for i in range(reps):
+                cmd = cmd_f(args)
+                print(
+                    "\r" + " " * 80 + "\r> " + " ".join(cmd) + f"\t({i+1}/{reps})",
+                    end="\r",
+                )
+                runs.append(call_executable(cmd))
+            rows.append(to_row(runs))
+    except Exception as e:
+        print("\r" + " " * 80, end="\r")
+        raise e
     print("\r" + " " * 80, end="\r")
     with open(csv_path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=rows[0].keys())

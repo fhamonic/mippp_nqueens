@@ -8,9 +8,9 @@ def cmd(args):
 
 
 def repetitions(args) -> int:
-    reps = int(5000 / args[1])
-    reps = min(reps, 20)
-    return max(reps, 5)
+    reps = int(1000000 / args[1]**2)
+    reps = min(reps, 10)
+    return max(reps, 1)
 
 
 def to_row(results: list):
@@ -18,9 +18,9 @@ def to_row(results: list):
         "N": int(results[0]["N"]),
         "num_variables": int(results[0]["num_variables"]),
         "num_constraints": int(results[0]["num_constraints"]),
-        "api_time_us": mean(r["api_time_us"] for r in results),
-        "cold_model_time_us": mean(r["cold_model_time_us"] for r in results),
-        "model_time_us": mean(r["model_time_us"] for r in results),
+        "api_time_ms": mean(r["api_time_ms"] for r in results),
+        "cold_model_time_ms": mean(r["cold_model_time_ms"] for r in results),
+        "model_time_ms": mean(r["model_time_ms"] for r in results),
     }
 
 
@@ -38,12 +38,10 @@ for solver in [
     "Xpress",
 ]:
     csv_path = f"{results_dir}/{solver}.csv"
-    if os.path.exists(csv_path):
-        continue
     try:
         args_list = [(solver, N) for N in range(100, 1001, 100)]
         run(cmd, args_list, repetitions, to_row, csv_path)
     except Exception as e:
         print(f"Skipped {solver}: {resume_exception(e)}")
         continue
-    print(f"{solver} Done!")
+    print(f"Done {solver}!")

@@ -17,7 +17,7 @@ void checkGRBError(int error, GRBenv * env) {
 
 int main(int argc, char * argv[]) {
     if(argc != 2) {
-        std::print("Usage: {} N\n", argv[0]);
+        std::print("Usage: {} <N>\n", argv[0]);
         return EXIT_FAILURE;
     }
     int N = atoi(argv[1]);
@@ -122,7 +122,7 @@ int main(int argc, char * argv[]) {
     error = GRBgetintattr(model, GRB_INT_ATTR_NUMCONSTRS, &num_constraints);
     checkGRBError(error, env);
 
-    const int model_time_us = chrono.lapTimeUs();
+    const int model_time_ms = chrono.lapTimeMs();
     std::optional<int> solve_time_ms;
 
     if(N < 20) {
@@ -154,8 +154,8 @@ int main(int argc, char * argv[]) {
     "N" : {},
     "num_variables" : {},
     "num_constraints" : {},
-    "model_time_us" : {})",
-               N, num_variables, num_constraints, model_time_us);
+    "model_time_ms" : {})",
+               N, num_variables, num_constraints, model_time_ms);
     if(solve_time_ms.has_value()) {
         std::print(stderr, R"(,
     "solve_time_ms" : {})",

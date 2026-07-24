@@ -53,40 +53,48 @@ int run(const std::string & solver, const int N) {
 
     auto indices = std::views::iota(0, N);
     // one per row
-    for(auto && row : indices) {
-        model.add_constraint(
-            xsum(indices, [&](auto && col) { return X(row, col); }) == 1);
-    }
+    model.add_constraints(distinct_variables, indices, [&](auto && row) {
+        return xsum(indices, [&, row](auto && col) { return X(row, col); }) ==
+               1;
+    });
     // one per column
-    for(auto && col : indices) {
-        model.add_constraint(
-            xsum(indices, [&](auto && row) { return X(row, col); }) == 1);
-    }
+    model.add_constraints(distinct_variables, indices, [&](auto && col) {
+        return xsum(indices, [&, col](auto && row) { return X(row, col); }) ==
+               1;
+    });
     // one per upper diagonal \ //
-    for(auto && top_col : std::views::iota(0, N - 1)) {
-        model.add_constraint(
-            xsum(std::views::iota(0, N - top_col),
-                 [&](auto && row) { return X(row, top_col + row); }) <= 1);
-    }
+    model.add_constraints(distinct_variables, std::views::iota(0, N - 1),
+                          [&](auto && top_col) {
+                              return xsum(std::views::iota(0, N - top_col),
+                                          [&, top_col](auto && row) {
+                                              return X(row, top_col + row);
+                                          }) <= 1;
+                          });
     // one per lower diagonal \ //
-    for(auto && left_row : std::views::iota(1, N - 1)) {
-        model.add_constraint(
-            xsum(std::views::iota(0, N - left_row),
-                 [&](auto && col) { return X(left_row + col, col); }) <= 1);
-    }
+    model.add_constraints(distinct_variables, std::views::iota(1, N - 1),
+                          [&](auto && left_row) {
+                              return xsum(std::views::iota(0, N - left_row),
+                                          [&, left_row](auto && col) {
+                                              return X(left_row + col, col);
+                                          }) <= 1;
+                          });
     // one per upper diagonal / //
-    for(auto && left_row : std::views::iota(1, N)) {
-        model.add_constraint(
-            xsum(std::views::iota(0, left_row + 1),
-                 [&](auto && col) { return X(left_row - col, col); }) <= 1);
-    }
+    model.add_constraints(distinct_variables, std::views::iota(1, N),
+                          [&](auto && left_row) {
+                              return xsum(std::views::iota(0, left_row + 1),
+                                          [&, left_row](auto && col) {
+                                              return X(left_row - col, col);
+                                          }) <= 1;
+                          });
     // one per lower diagonal / //
-    for(auto && bottom_col : std::views::iota(1, N - 1)) {
-        model.add_constraint(
-            xsum(std::views::iota(bottom_col, N), [&](auto && col) {
-                return X(N - 1 - (col - bottom_col), col);
-            }) <= 1);
-    }
+    model.add_constraints(
+        distinct_variables, std::views::iota(1, N - 1),
+        [&](auto && bottom_col) {
+            return xsum(std::views::iota(bottom_col, N),
+                        [&, bottom_col](auto && col) {
+                            return X(N - 1 - (col - bottom_col), col);
+                        }) <= 1;
+        });
 
     // also trigger update for buffered models
     const auto num_variables = model.num_variables();

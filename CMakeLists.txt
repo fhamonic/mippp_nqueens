@@ -25,8 +25,14 @@ endfunction()
 add_executable(mippp src/mippp.cpp)
 set_mippp_options(mippp)
 
+add_executable(mippp_distinct src/mippp_distinct.cpp)
+set_mippp_options(mippp_distinct)
+
 add_executable(mippp_bulk src/mippp_bulk.cpp)
 set_mippp_options(mippp_bulk)
+
+add_executable(mippp_bulk_distinct src/mippp_bulk_distinct.cpp)
+set_mippp_options(mippp_bulk_distinct)
 
 
 if(EXISTS "$ENV{GUROBI_HOME}/include/gurobi_c.h")

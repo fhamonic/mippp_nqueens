@@ -55,34 +55,40 @@ int run(const std::string & solver, const int N) {
     // one per row
     for(auto && row : indices) {
         model.add_constraint(
+            distinct_variables,
             xsum(indices, [&](auto && col) { return X(row, col); }) == 1);
     }
     // one per column
     for(auto && col : indices) {
         model.add_constraint(
+            distinct_variables,
             xsum(indices, [&](auto && row) { return X(row, col); }) == 1);
     }
     // one per upper diagonal \ //
     for(auto && top_col : std::views::iota(0, N - 1)) {
         model.add_constraint(
+            distinct_variables,
             xsum(std::views::iota(0, N - top_col),
                  [&](auto && row) { return X(row, top_col + row); }) <= 1);
     }
     // one per lower diagonal \ //
     for(auto && left_row : std::views::iota(1, N - 1)) {
         model.add_constraint(
+            distinct_variables,
             xsum(std::views::iota(0, N - left_row),
                  [&](auto && col) { return X(left_row + col, col); }) <= 1);
     }
     // one per upper diagonal / //
     for(auto && left_row : std::views::iota(1, N)) {
         model.add_constraint(
+            distinct_variables,
             xsum(std::views::iota(0, left_row + 1),
                  [&](auto && col) { return X(left_row - col, col); }) <= 1);
     }
     // one per lower diagonal / //
     for(auto && bottom_col : std::views::iota(1, N - 1)) {
         model.add_constraint(
+            distinct_variables,
             xsum(std::views::iota(bottom_col, N), [&](auto && col) {
                 return X(N - 1 - (col - bottom_col), col);
             }) <= 1);

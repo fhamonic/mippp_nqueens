@@ -45,7 +45,7 @@ template <typename API, typename MODEL>
 int run(const std::string & solver, const int N) {
     Chrono chrono;
     API api;
-    int api_time_us = chrono.lapTimeUs();
+    int api_time_ms = chrono.lapTimeMs();
     MODEL model(api);
 
     auto X = model.add_binary_variables(
@@ -95,7 +95,7 @@ int run(const std::string & solver, const int N) {
     const auto num_variables = model.num_variables();
     const auto num_constraints = model.num_constraints();
 
-    const int model_time_us = chrono.lapTimeUs();
+    const int model_time_ms = chrono.lapTimeMs();
     std::optional<int> solve_time_ms;
 
     if(N < 20) {
@@ -115,10 +115,10 @@ int run(const std::string & solver, const int N) {
     "N" : {},
     "num_variables" : {},
     "num_constraints" : {},
-    "api_time_us" : {},
-    "model_time_us" : {})",
-               solver, N, num_variables, num_constraints, api_time_us,
-               model_time_us);
+    "api_time_ms" : {},
+    "model_time_ms" : {})",
+               solver, N, num_variables, num_constraints, api_time_ms,
+               model_time_ms);
     if(solve_time_ms.has_value()) {
         std::print(stderr, R"(,
     "solve_time_ms" : {})",

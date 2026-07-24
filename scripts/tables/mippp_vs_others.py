@@ -5,13 +5,9 @@ def to_float(N, value):
     return "{:.1f} ms".format(float(value) / 1_000)
 
 
-def to_cbc_scale(N, value):
+def to_first_scale(N, value):
     ref_value = table_data[0][1][0][1][N]
     return "{:.1f} x".format(float(value) / float(ref_value))
-
-
-def to_us_cbc_scale(N, value):
-    return to_cbc_scale(N, float(value) * 1_000_000)
 
 
 def to_highs_scale(N, value):
@@ -25,12 +21,12 @@ table_data = [
         [
             (
                 "Cbc",
-                read_col("results/mippp/Cbc_mippp_bulk.csv", "model_time_us"),
+                read_col("results/mippp/Cbc_distinct.csv", "model_time_ms"),
                 to_float,
             ),
             (
                 "HiGHS",
-                read_col("results/mippp/Highs_mippp_bulk.csv", "model_time_us"),
+                read_col("results/mippp/Highs_distinct.csv", "model_time_ms"),
                 to_float,
             ),
         ],
@@ -40,12 +36,12 @@ table_data = [
         [
             (
                 "Cbc",
-                read_col("results/or_tools/Cbc.csv", "model_time_us"),
-                to_cbc_scale,
+                read_col("results/or_tools/Cbc.csv", "model_time_ms"),
+                to_first_scale,
             ),
             (
                 "HiGHS",
-                read_col("results/or_tools/Highs.csv", "model_time_us"),
+                read_col("results/or_tools/Highs.csv", "model_time_ms"),
                 to_highs_scale,
             ),
         ],
@@ -55,12 +51,12 @@ table_data = [
         [
             (
                 "Cbc",
-                read_col("results/jump/Cbc.csv", "model_time_us"),
-                to_cbc_scale,
+                read_col("results/jump/Cbc.csv", "model_time_ms"),
+                to_first_scale,
             ),
             (
                 "HiGHS",
-                read_col("results/jump/Highs.csv", "model_time_us"),
+                read_col("results/jump/Highs.csv", "model_time_ms"),
                 to_highs_scale,
             ),
         ],

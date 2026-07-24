@@ -26,17 +26,17 @@ table_data = [
         [
             (
                 "Cbc",
-                read_col("results/mippp/Cbc_mippp_bulk.csv", "model_time_us"),
+                read_col("results/mippp/Cbc_mippp_bulk.csv", "model_time_ms"),
                 to_float,
             ),
             (
                 "HiGHS",
-                read_col("results/mippp/Highs_mippp_bulk.csv", "model_time_us"),
+                read_col("results/mippp/Highs_mippp_bulk.csv", "model_time_ms"),
                 to_float,
             ),
             (
                 "SCIP",
-                read_col("results/mippp/SCIP_mippp_bulk.csv", "model_time_us"),
+                read_col("results/mippp/SCIP_mippp_bulk.csv", "model_time_ms"),
                 to_float,
             ),
         ],
@@ -46,17 +46,17 @@ table_data = [
         [
             (
                 "Cbc",
-                read_col("results/or_tools/Cbc.csv", "model_time_us"),
+                read_col("results/or_tools/Cbc.csv", "model_time_ms"),
                 to_first_scale,
             ),
             (
                 "HiGHS",
-                read_col("results/or_tools/Highs.csv", "model_time_us"),
+                read_col("results/or_tools/Highs.csv", "model_time_ms"),
                 to_highs_scale,
             ),
             (
                 "SCIP",
-                read_col("results/or_tools/SCIP.csv", "model_time_us"),
+                read_col("results/or_tools/SCIP.csv", "model_time_ms"),
                 to_scip_scale,
             ),
         ],
