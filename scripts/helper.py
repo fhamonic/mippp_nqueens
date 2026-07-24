@@ -15,7 +15,7 @@ def call_executable(cmd):
         )
         # Strip stderr befor json
         result = process.stderr.strip()
-        result = result[result.find("{") :]
+        result = result[result.find("{") : result.find("}")]
         return json.loads(result)
     except subprocess.CalledProcessError as e:
         raise Exception(e.stderr.strip() + "\n" + str(e))

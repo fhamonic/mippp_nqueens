@@ -4,7 +4,7 @@ from statistics import mean
 
 
 def cmd(N):
-    return ["python",  "", str(N)]
+    return ["python", "src/gurobi.py", str(N)]
 
 
 def repetitions(N) -> int:
