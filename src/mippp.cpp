@@ -92,12 +92,12 @@ int run(const std::string & solver, const int N) {
     const auto num_variables = model.num_variables();
     const auto num_constraints = model.num_constraints();
 
-    const int model_time_ms = chrono.lapTimeMs();
-    std::optional<int> solve_time_ms;
+    const double model_time_ms = chrono.lapTimeUs() / 1000.0;
+    std::optional<double> solve_time_ms;
 
     if(N < 20) {
         model.solve();
-        solve_time_ms.emplace(chrono.lapTimeMs());
+        solve_time_ms.emplace(chrono.lapTimeUs() / 1000.0);
         auto solution = model.get_solution();
         for(auto i : indices) {
             for(auto j : indices) {

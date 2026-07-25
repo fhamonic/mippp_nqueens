@@ -8,7 +8,7 @@ def cmd(args):
 
 
 def repetitions(args) -> int:
-    reps = int(1000000 / args[1]**2)
+    reps = int(1000000 / args[1] ** 2)
     reps = min(reps, 10)
     return max(reps, 1)
 

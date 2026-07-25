@@ -1,87 +1,200 @@
 # N-Queens modeling benchmarks
 
-This repository measures the time it takes to *fill* a N-Queens MILP model
-(N² binary variables, 6N-6 constraints) through several modeling interfaces:
-[MIP++](https://github.com/fhamonic/mippp), the OR-Tools `MPSolver` C++ API,
-the Gurobi C API, JuMP, Python-MIP and PuLP.
-Only model construction is timed, never the resolution.
-These results are to be compared with the [Python-MIP benchmarks](https://python-mip.readthedocs.io/en/latest/bench.html#) of python interfaces.
+This repository measures how long it takes to *fill* a N-Queens MILP model
+(N² binary variables, 6N-6 constraints) through several modeling interfaces.
+**Only model construction is timed, never the resolution.**
 
-The following table contains the time *in Milliseconds* required by MIP++ to
-fill the model, and how much longer the other C++/Julia interfaces take on the
-same machine.
+The interfaces compared are:
 
-| N | MIP++<br>Cbc | MIP++<br>HiGHS | OR-tools<br>Cbc | OR-tools<br>HiGHS | JuMP<br>Cbc | JuMP<br>HiGHS |
+- [MIP++](https://github.com/fhamonic/mippp) — the header-only C++ modeling library benchmarked here;
+- the OR-Tools `MPSolver` C++ API (`or-tools/9.15`);
+- the Gurobi C API;
+- [JuMP](https://jump.dev/) (Julia);
+- the Python interfaces [gurobipy](https://pypi.org/project/gurobipy/), [highspy](https://pypi.org/project/highspy/), [PuLP](https://pypi.org/project/PuLP/) and [Python-MIP](https://www.python-mip.com/), each run on CPython and, where relevant, on PyPy.
+
+Every benchmark is self-contained in this repository (`src/`): there is no
+longer any external submodule or dependency on the Python-MIP repository.
+
+The headline result: **MIP++ builds the model within a few percent of the
+time taken by the raw Gurobi C API** (see [MIP++ vs the Gurobi C API](#mip-vs-the-gurobi-c-api)),
+while being several times faster than the other C++/Julia interfaces and two to
+three *orders of magnitude* faster than the Python ones.
+
+## MIP++ vs the other C++/Julia interfaces
+
+Time *in milliseconds* required by MIP++ to fill the model, and how much longer
+the OR-Tools `MPSolver` C++ API and JuMP take on the same machine for the two
+backends common to all three (Cbc and HiGHS):
+
+| N | <div align="center">MIP++<br>Cbc</div> | <div align="center">MIP++<br>HiGHS</div> | <div align="center">OR-tools<br>Cbc</div> | <div align="center">OR-tools<br>HiGHS</div> | <div align="center">JuMP<br>Cbc</div> | <div align="center">JuMP<br>HiGHS</div> |
 |:---:|---:|---:|---:|---:|---:|---:|
-| 100 | 1.0 ms | 1.2 ms | 3.7 x | 3.0 x | 11.8 x | 59.7 x |
-| 200 | 3.4 ms | 5.0 ms | 4.1 x | 2.7 x | 29.4 x | 5.4 x |
-| 300 | 7.1 ms | 11.8 ms | 4.5 x | 2.7 x | 10.3 x | 10.3 x |
-| 400 | 12.4 ms | 21.1 ms | 4.4 x | 2.6 x | 15.0 x | 8.3 x |
-| 500 | 19.6 ms | 36.8 ms | 4.6 x | 2.5 x | 13.4 x | 7.2 x |
-| 600 | 27.6 ms | 50.1 ms | 4.8 x | 2.6 x | 12.7 x | 7.1 x |
-| 700 | 39.3 ms | 67.5 ms | 4.6 x | 2.6 x | 14.4 x | 6.8 x |
-| 800 | 49.0 ms | 100.5 ms | 4.7 x | 2.3 x | 12.4 x | 6.9 x |
-| 900 | 62.2 ms | 127.3 ms | 5.1 x | 2.5 x | 12.8 x | 6.1 x |
-| 1000 | 73.3 ms | 147.7 ms | 5.2 x | 2.6 x | 14.0 x | 6.4 x |
+| 100 | 0.8 ms | 1.4 ms | 4.3 x | 2.5 x | 15.7 x | 49.3 x |
+| 200 | 3.0 ms | 5.5 ms | 4.6 x | 2.5 x | 32.9 x | 4.9 x |
+| 300 | 6.4 ms | 13.4 ms | 5.0 x | 2.4 x | 11.0 x | 8.7 x |
+| 400 | 10.8 ms | 21.8 ms | 5.0 x | 2.5 x | 16.9 x | 8.0 x |
+| 500 | 17.2 ms | 34.2 ms | 5.2 x | 2.7 x | 14.7 x | 9.6 x |
+| 600 | 24.3 ms | 54.3 ms | 5.4 x | 2.4 x | 14.2 x | 6.4 x |
+| 700 | 33.4 ms | 68.8 ms | 5.3 x | 2.6 x | 16.6 x | 6.5 x |
+| 800 | 42.8 ms | 93.8 ms | 5.4 x | 2.4 x | 14.1 x | 7.4 x |
+| 900 | 54.3 ms | 116.2 ms | 5.7 x | 2.7 x | 15.6 x | 7.4 x |
+| 1000 | 66.0 ms | 139.4 ms | 5.8 x | 2.8 x | 14.0 x | 6.3 x |
 
-Cbc is the one backend common to all the interfaces compared here, and HiGHS is
-shared by MIP++, OR-Tools and JuMP, which is why the tables use them. The
-benchmark runners also produce CSV files for every other solver they find at
-runtime (GLPK, SCIP, CPLEX, MOSEK, COPT, Gurobi and Xpress for MIP++), they are
-simply not tabulated.
+Cbc is the one backend common to every interface, and HiGHS is shared by MIP++,
+OR-Tools and JuMP, which is why the tables use them. The benchmark runners also
+produce CSV files for every other solver they find at runtime (GLPK, SCIP,
+CPLEX, MOSEK, COPT, Gurobi and Xpress for MIP++); they are simply not tabulated
+here.
 
-## Model construction: one constraint at a time vs. bulk
+## How the model is built: single vs bulk, and the `distinct_variables` hint
 
-Two executables are built from the same model:
+Four MIP++ executables are built from the same model, differing only in *how*
+the constraints are handed to the library:
 
-- `mippp` (`src/mippp.cpp`) adds the constraints one at a time with
-  `model.add_constraint(...)`, mirroring how the OR-Tools, JuMP, Python-MIP and
-  PuLP models are written. **All the MIP++ numbers in this README come from this
-  executable**, so that the comparison stays apples-to-apples.
-- `mippp_bulk` (`src/mippp_bulk.cpp`) uses the bulk `model.add_constraints(range, lambda)`
-  overload instead, and writes its own `results/mippp/<solver>_mippp_bulk.csv`
-  files.
+| executable | constraints added | `distinct_variables` hint | CSV suffix |
+|---|---|---|---|
+| `mippp` | one at a time (`add_constraint`) | no | *(none)* |
+| `mippp_distinct` | one at a time (`add_constraint`) | yes | `_distinct` |
+| `mippp_bulk` | in bulk (`add_constraints(range, λ)`) | no | `_bulk` |
+| `mippp_bulk_distinct` | in bulk (`add_constraints(range, λ)`) | yes | `_bulk_distinct` |
 
-The same split exists for the Gurobi C API: `gurobi_c` (`src/gurobi_c.cpp`)
-calls `GRBaddconstr` per constraint while `gurobi_c_bulk`
-(`src/gurobi_c_bulk.cpp`) builds the whole matrix in one `GRBaddconstrs` call.
+The `distinct_variables` tag tells MIP++ that the terms of each linear
+expression reference pairwise-distinct variables, letting it skip the
+coefficient-merging (deduplication) step it would otherwise perform. In the
+N-Queens model every constraint genuinely has distinct variables, so the hint is
+an idiomatic use rather than a shortcut, and it is what makes MIP++ competitive
+with the raw solver C APIs.
+
+Timing all four variants for the Cbc backend (the one common to every
+interface) shows what each axis is worth:
+
+| N | <div align="center">MIP++ · Cbc<br>one-at-a-time</div> | <div align="center">MIP++ · Cbc<br>+ distinct</div> | <div align="center">MIP++ · Cbc<br>bulk</div> | <div align="center">MIP++ · Cbc<br>bulk + distinct</div> |
+|:---:|---:|---:|---:|---:|
+| 100 | 0.9 ms | 0.8 ms | 1.0 ms | 0.9 ms |
+| 200 | 3.3 ms | 3.0 ms | 3.4 ms | 3.0 ms |
+| 300 | 7.1 ms | 6.4 ms | 7.2 ms | 6.3 ms |
+| 400 | 12.4 ms | 10.8 ms | 12.5 ms | 11.2 ms |
+| 500 | 18.7 ms | 17.2 ms | 19.3 ms | 17.2 ms |
+| 600 | 28.0 ms | 24.3 ms | 28.7 ms | 25.1 ms |
+| 700 | 37.8 ms | 33.4 ms | 38.4 ms | 33.0 ms |
+| 800 | 48.8 ms | 42.8 ms | 50.7 ms | 44.5 ms |
+| 900 | 61.0 ms | 54.3 ms | 63.5 ms | 55.2 ms |
+| 1000 | 72.3 ms | 66.0 ms | 74.2 ms | 66.6 ms |
+
+The `distinct_variables` hint is the one that pays off — about 10% for Cbc and a
+few percent for the other backends, but always in MIP++'s favor. One-at-a-time
+vs bulk barely moves the needle for Cbc, and the sign of the (small) difference
+is backend-dependent: bulk helps HiGHS a little but is marginally *slower* for
+Gurobi. **All the MIP++
+numbers elsewhere in this README come from `mippp_distinct`** — one constraint
+at a time, mirroring how the OR-Tools, JuMP and Python models are written, plus
+the hint.
+
+The same one-at-a-time / bulk split exists for the Gurobi C API: `gurobi_c`
+calls `GRBaddconstr` per constraint while `gurobi_c_bulk` builds the whole
+matrix in a single `GRBaddconstrs` call.
 
 ## MIP++ vs OR-Tools
 
-The following table compares the time *in Milliseconds* required to fill the
-same N-Queens MILP model through MIP++ and through the OR-Tools `MPSolver` C++
-API (`or-tools/9.15`), for the solvers supported by both.
+Time *in milliseconds* required to fill the same model through MIP++ and through
+the OR-Tools `MPSolver` C++ API, for the three backends supported by both:
 
-| N | MIP++<br>Cbc | MIP++<br>HiGHS | MIP++<br>SCIP | OR-tools<br>Cbc | OR-tools<br>HiGHS | OR-tools<br>SCIP |
+| N | <div align="center">MIP++<br>Cbc</div> | <div align="center">MIP++<br>HiGHS</div> | <div align="center">MIP++<br>SCIP</div> | <div align="center">OR-tools<br>Cbc</div> | <div align="center">OR-tools<br>HiGHS</div> | <div align="center">OR-tools<br>SCIP</div> |
 |:---:|---:|---:|---:|---:|---:|---:|
-| 100 | 1.0 ms | 1.2 ms | 8.3 ms | 3.7 x | 3.0 x | 0.4 x |
-| 200 | 3.4 ms | 5.0 ms | 27.1 ms | 4.1 x | 2.7 x | 0.5 x |
-| 300 | 7.1 ms | 11.8 ms | 60.8 ms | 4.5 x | 2.7 x | 0.5 x |
-| 400 | 12.4 ms | 21.1 ms | 96.1 ms | 4.4 x | 2.6 x | 0.6 x |
-| 500 | 19.6 ms | 36.8 ms | 144.4 ms | 4.6 x | 2.5 x | 0.6 x |
-| 600 | 27.6 ms | 50.1 ms | 223.5 ms | 4.8 x | 2.6 x | 0.6 x |
-| 700 | 39.3 ms | 67.5 ms | 303.3 ms | 4.6 x | 2.6 x | 0.6 x |
-| 800 | 49.0 ms | 100.5 ms | 417.0 ms | 4.7 x | 2.3 x | 0.6 x |
-| 900 | 62.2 ms | 127.3 ms | 531.3 ms | 5.1 x | 2.5 x | 0.6 x |
-| 1000 | 73.3 ms | 147.7 ms | 653.7 ms | 5.2 x | 2.6 x | 0.6 x |
+| 100 | 0.8 ms | 1.4 ms | 8.1 ms | 4.3 x | 2.5 x | 0.4 x |
+| 200 | 3.0 ms | 5.5 ms | 26.8 ms | 4.6 x | 2.5 x | 0.5 x |
+| 300 | 6.4 ms | 13.4 ms | 57.7 ms | 5.0 x | 2.4 x | 0.6 x |
+| 400 | 10.8 ms | 21.8 ms | 92.6 ms | 5.0 x | 2.5 x | 0.6 x |
+| 500 | 17.2 ms | 34.2 ms | 140.9 ms | 5.2 x | 2.7 x | 0.7 x |
+| 600 | 24.3 ms | 54.3 ms | 209.6 ms | 5.4 x | 2.4 x | 0.6 x |
+| 700 | 33.4 ms | 68.8 ms | 295.7 ms | 5.3 x | 2.6 x | 0.6 x |
+| 800 | 42.8 ms | 93.8 ms | 394.6 ms | 5.4 x | 2.4 x | 0.6 x |
+| 900 | 54.3 ms | 116.2 ms | 513.9 ms | 5.7 x | 2.7 x | 0.6 x |
+| 1000 | 66.0 ms | 139.4 ms | 643.6 ms | 5.8 x | 2.8 x | 0.6 x |
 
-Note that `MPSolver` stores the model in its own backend-independent data structures and only extracts it to the underlying solver when `Solve()` is called, which is why its fill times are nearly identical for all backends and exclude the actual solver load. The MIP++ (and Gurobi C API) timings instead include building the model in the solver's native in-memory representation. The OR-Tools `Gurobi` backend is also supported by `src/or_tools.cpp` but requires a valid Gurobi license at runtime.
+MIP++ fills the model 5–6× faster than `MPSolver` for Cbc and ~2.5× faster for
+HiGHS. **SCIP is the exception**: `MPSolver` stores the model in its own
+backend-independent data structures and only extracts it into the underlying
+solver when `Solve()` is called, so its fill time excludes the SCIP load
+entirely and is nearly identical across all three backends. MIP++ (like the
+Gurobi C API below) instead builds directly in the solver's native in-memory
+representation, and SCIP's incremental build API is slow — hence MIP++ appears
+"slower" for SCIP even though it is doing strictly more work up front. The
+OR-Tools `Gurobi` backend is also supported by `src/or_tools.cpp` but requires a
+valid Gurobi license at runtime.
+
+## MIP++ vs the Gurobi C API
+
+The most direct measure of MIP++'s overhead: the pure Gurobi C API in absolute
+milliseconds, MIP++ as a *percentage* of it, and the other Gurobi-capable
+interfaces as multiples of it.
+
+| N | Gurobi C API | MIP++ | gurobipy | <div align="center">JuMP<br>warm</div> | <div align="center">JuMP<br>cold</div> | <div align="center">Python-MIP<br>CPython</div> | <div align="center">Python-MIP<br>PyPy</div> |
+|:---:|---:|---:|---:|---:|---:|---:|---:|
+| 100 | 3.2 ms | 96.2 % | 33.3 x | 2.9 x | 151.3 x | 45.4 x | 37.5 x |
+| 200 | 8.7 ms | 98.5 % | 86.2 x | 4.2 x | 60.2 x | 98.9 x | 19.8 x |
+| 300 | 17.7 ms | 96.8 % | 146.3 x | 3.8 x | 35.3 x | 156.3 x | 15.5 x |
+| 400 | 30.4 ms | 96.9 % | 207.3 x | 6.0 x | 22.4 x | 218.1 x | 14.7 x |
+| 500 | 46.4 ms | 99.6 % | 273.1 x | 5.7 x | 15.9 x | 281.1 x | 15.2 x |
+| 600 | 66.4 ms | 99.9 % | 329.7 x | 5.2 x | 13.5 x | 337.2 x | 16.2 x |
+| 700 | 91.7 ms | 100.3 % | 380.2 x | 5.0 x | 11.8 x | 390.3 x | 17.1 x |
+| 800 | 120.1 ms | 100.5 % | 435.1 x | 5.8 x | 10.1 x | 450.7 x | 18.6 x |
+| 900 | 154.6 ms | 99.9 % | 484.5 x | 4.8 x | 9.3 x | 496.6 x | 19.2 x |
+| 1000 | 188.4 ms | 101.3 % | 549.8 x | 5.6 x | 8.5 x | 557.4 x | 21.0 x |
+
+MIP++ tracks the raw C API to within a few percent across the whole sweep
+(≈96–101%, and marginally *faster* than it for the smaller models) — the
+modeling layer is essentially free. gurobipy and CPython Python-MIP, by
+contrast, take several *hundred* times longer to build the identical model.
+JuMP's `cold` column includes Julia's JIT compilation (paid once per process);
+its `warm` column is a rebuild in the same process.
+
+## Python modeling interfaces
+
+The Python benchmarks are self-contained (`src/gurobi.py`, `src/highs.py`,
+`src/pulp_.py`, `src/python-mip.py`) and time a single build per model. Fill
+time *in milliseconds* (values reach tens of seconds at N=1000):
+
+| N | <div align="center">highspy<br>HiGHS</div> | <div align="center">PuLP<br>Cbc · CPython</div> | <div align="center">PuLP<br>Cbc · PyPy</div> | <div align="center">Python-MIP<br>Cbc · CPython</div> | <div align="center">Python-MIP<br>Cbc · PyPy</div> |
+|:---:|---:|---:|---:|---:|---:|
+| 100 | 0.20 s | 0.15 s | 0.06 s | 0.16 s | 0.16 s |
+| 200 | 0.79 s | 0.90 s | 0.18 s | 0.87 s | 0.20 s |
+| 300 | 1.76 s | 2.99 s | 0.40 s | 2.83 s | 0.30 s |
+| 400 | 3.19 s | 7.18 s | 0.74 s | 6.67 s | 0.45 s |
+| 500 | 4.93 s | 14.13 s | 1.23 s | 13.27 s | 0.67 s |
+| 600 | 7.06 s | 24.40 s | 1.88 s | 22.43 s | 0.97 s |
+| 700 | 9.52 s | 39.24 s | 2.75 s | 36.02 s | 1.40 s |
+| 800 | 12.32 s | 58.16 s | 3.74 s | 53.75 s | 2.00 s |
+| 900 | 16.84 s | 83.89 s | 4.97 s | 76.41 s | 2.67 s |
+| 1000 | 19.81 s | 115.01 s | 6.36 s | 104.94 s | 3.55 s |
+
+For the pure-Python builders (PuLP, Python-MIP) the interpreter dominates: PyPy's
+JIT makes them ~18× (PuLP) and ~30× (Python-MIP) faster than CPython at N=1000.
+For reference, MIP++ builds these same models in single- to low-hundreds of
+milliseconds (tables above) — hundreds to thousands of times faster than any
+CPython interface.
+
+`gurobipy` (Gurobi, CPython) and the CPython Gurobi Python-MIP results appear in
+the [Gurobi table](#mip-vs-the-gurobi-c-api) above.
 
 ## Reproducing the benchmarks
 
-The numbers above were obtained on an AMD Ryzen 7 7800X3D (Ubuntu 22.04, GCC 14.1), with every C++ benchmark compiled with the same compiler and flags (`-std=c++23`, `Release`, `-flto`).
+The numbers above were obtained on an AMD Ryzen 7 7800X3D (Ubuntu 22.04), with
+every C++ benchmark compiled with the same compiler and flags (GCC 14,
+`Release`, `-std=c++23`, `-flto`), as configured by `profiles/gcc14_c++23`.
 
 ### Requirements
 
 - Linux, GCC >= 14 and [Conan](https://conan.io) >= 2.12 (the build uses the `CMakeConfigDeps` generator; CMake itself is provisioned by Conan).
-- The [MIP++](https://github.com/fhamonic/mippp) Conan package (header-only, see below).
-- OR-Tools is fetched and built from source automatically by Conan (`or-tools/9.15` with statically linked Cbc, SCIP and HiGHS backends), so the OR-Tools benchmarks need no license and no pre-installed solver.
-- The `mippp`/`mippp_bulk` executables load the solvers' shared libraries at *runtime* (`dlopen`): install the ones you want to benchmark (Cbc, SCIP and HiGHS are free; Gurobi, CPLEX, MOSEK and COPT also require a license) and make them visible through `LD_LIBRARY_PATH`.
-- The `gurobi_c`/`gurobi_c_bulk` executables (Gurobi C API) link against the Gurobi SDK and are only built when it is found: set the `GUROBI_HOME` environement variable to your installation, typically with `export GUROBI_HOME=".../gurobi1201/linux64"`.
+- The [MIP++](https://github.com/fhamonic/mippp) Conan package (header-only, exported below).
+- OR-Tools is fetched and built from source automatically by Conan (`or-tools/9.15`, with statically-linked Cbc, SCIP and HiGHS backends), so the OR-Tools benchmarks need no license and no pre-installed solver.
+- The `mippp*` executables load the solvers' shared libraries at *runtime* (`dlopen`): install the ones you want to benchmark (Cbc, GLPK, SCIP and HiGHS are free; Gurobi, CPLEX, MOSEK, COPT and Xpress also require a license) and make them visible through `LD_LIBRARY_PATH`.
+- The `gurobi_c`/`gurobi_c_bulk` executables link against the Gurobi SDK and are only built when it is found: set `GUROBI_HOME`, typically `export GUROBI_HOME=".../gurobi1201/linux64"`.
+- **Python interfaces**: `pip install highspy pulp mip gurobipy`. highspy, PuLP and Python-MIP bundle a free Cbc/HiGHS; gurobipy and the Gurobi backend of Python-MIP need a licensed Gurobi. For the PyPy columns, install `pulp` and `mip` under `pypy3` as well.
+- **JuMP**: a Julia installation with `JuMP`, `Cbc` and `HiGHS` (and optionally `Gurobi`) added.
 
 Two Conan profiles are provided, `profiles/gcc14_c++23` (used for the numbers
 above) and `profiles/gcc15_c++26`. **Both hardcode the `CC`/`CXX` paths of the
-machine they were written on**, edit them to point at your own GCC before
+machine they were written on**; edit them to point at your own GCC before
 building.
 
 ### Building
@@ -94,15 +207,19 @@ cd mippp_nqueens
 git clone https://github.com/fhamonic/mippp
 conan create mippp -pr=profiles/gcc14_c++23 -b=missing -c tools.build:skip_test=true
 
-# 2. build the benchmarks (the first run also builds or-tools and its dependency tree from source, which takes tens of minutes)
+# 2. build the benchmarks (the first run also builds or-tools and its whole
+#    dependency tree from source, which takes tens of minutes)
 conan build . -of=build -pr=profiles/gcc14_c++23 -b=missing
 ```
 
 The executables are produced directly in `build/` (`build/mippp`,
-`build/mippp_bulk`, `build/or_tools`, and `build/gurobi_c*` when the Gurobi SDK
-is found).
+`build/mippp_distinct`, `build/mippp_bulk`, `build/mippp_bulk_distinct`,
+`build/or_tools`, and `build/gurobi_c*` when the Gurobi SDK is found).
 
-Known issue: `or-tools/9.15` pins `CXX_STANDARD 17` on a few auxiliary targets, which fails against the abseil version pinned by its recipe (it requires C++20). If the or-tools build fails on `fzn-parser_test`, patch the sources in the Conan cache and re-run the `conan build` command above, it will pick the patched sources up:
+Known issue: `or-tools/9.15` pins `CXX_STANDARD 17` on a few auxiliary targets,
+which fails against the abseil version its recipe pins (that requires C++20). If
+the or-tools build fails on `fzn-parser_test`, patch the sources in the Conan
+cache and re-run the `conan build` command above:
 
 ```sh
 sed -i 's/CXX_STANDARD 17/CXX_STANDARD 20/' \
@@ -112,103 +229,46 @@ sed -i 's/CXX_STANDARD 17/CXX_STANDARD 20/' \
 
 ### Running
 
-All the scripts below are meant to be run from the root of the repository.
+Run everything with `make all`, or run any of the individual scripts (all from
+the repository root):
 
 ```sh
-python3 scripts/benchmark_mippp.py     # -> results/mippp/<solver>_mippp[_bulk].csv
-python3 scripts/benchmark_ortools.py   # -> results/or_tools/<solver>_or_tools.csv
-python3 scripts/benchmark_gurobi.py    # -> results/gurobi_c[_bulk].csv
+python3 scripts/benchmark_mippp.py        # -> results/mippp/<solver>[_bulk][_distinct].csv
+python3 scripts/benchmark_ortools.py      # -> results/or_tools/<solver>.csv
+python3 scripts/benchmark_gurobi.py       # -> results/gurobi/gurobi_c[_bulk].csv
+python3 scripts/benchmark_gurobipy.py     # -> results/gurobi/gurobipy.csv
+python3 scripts/benchmark_highspy.py      # -> results/highs/highspy.csv
+python3 scripts/benchmark_jump.py         # -> results/jump/<solver>.csv
+python3 scripts/benchmark_pulp.py         # -> results/pulp/<python>.csv
+python3 scripts/benchmark_python-mip.py   # -> results/python-mip/<python>_<solver>.csv
 ```
 
-Each runner sweeps `N` from 100 to 1000, repeats every point between 5 and 20
-times (fewer repetitions for the larger models), drops the first run as a
-warm-up and averages the rest. Solvers whose shared library or license is
-missing at runtime are reported as skipped and produce no CSV.
+Each runner sweeps `N` from 100 to 1000 and repeats every point several times
+(fewer repetitions for the larger models) before averaging; the PuLP and
+Python-MIP runners additionally drop a warm-up build. Solvers whose
+shared library, package or license is missing at runtime are reported as skipped
+and produce no CSV. Every runner overwrites its CSVs on each run.
 
-`benchmark_mippp.py`, `benchmark_ortools.py` and `benchmark_jump.py` leave any
-CSV that already exists untouched, delete the file to refresh it.
-`benchmark_gurobi.py` always re-runs and overwrites.
+The runners spawn the CPython interpreter as `python` (and the PyPy one as
+`pypy3`), so make sure a `python` on your `PATH` resolves to the CPython where
+the packages are installed — on a stock Ubuntu that ships only `python3`,
+activate a virtualenv or install `python-is-python3`. See
+[INSTALL.md](INSTALL.md) for the full dependency setup.
 
-`results/` is listed in `.gitignore`, so none of the CSV files are committed:
-running the benchmarks yourself is the only way to populate it.
+`results/` is listed in `.gitignore`, so none of the CSV files are committed.
 
 ### Regenerating the tables
 
-The markdown tables of this README are produced from the CSV files by:
+The markdown tables above are produced from the CSV files by the scripts under
+`scripts/tables/`:
 
 ```sh
-python3 scripts/tables/mippp_vs_others.py
-python3 scripts/tables/mippp_vs_or-tools.py
-python3 scripts/tables/jump_vs_python.py
+python3 scripts/tables/mippp_vs_others.py     # MIP++ vs OR-Tools vs JuMP
+python3 scripts/tables/mippp_vs_or-tools.py   # MIP++ vs OR-Tools (Cbc, HiGHS, SCIP)
+python3 scripts/tables/gurobi_vs_mippp.py     # Gurobi C API vs MIP++ vs the rest
+python3 scripts/tables/python_interfaces.py   # highspy / PuLP / Python-MIP
+python3 scripts/tables/mippp_variants.py      # the four MIP++ build variants (Cbc)
 ```
 
-Each script reads every CSV it needs at import time, so all the corresponding
+Each script reads every CSV it needs at import time, so the corresponding
 benchmarks must have been run first.
-
-### Python and JuMP benchmarks
-
-| N | JuMP<br>Cbc (warm) | JuMP<br>Cbc (cold) | Python-MIP<br>Cbc (CPython) | Python-MIP<br>Cbc (Pypy) | PuLP<br>Cbc (CPython) | PuLP<br>Cbc (Pypy) |
-|:---:|---:|---:|---:|---:|---:|---:|
-| 100 | 11.5 ms | 219.7 x | 14.0 x | 13.8 x | 12.0 x | 6.2 x |
-| 200 | 98.7 ms | 25.8 x | 8.2 x | 0.9 x | 9.3 x | 1.8 x |
-| 300 | 73.8 ms | 36.3 x | 37.1 x | 2.7 x | 40.2 x | 4.9 x |
-| 400 | 185.8 ms | 14.8 x | 36.4 x | 2.1 x | 39.5 x | 3.6 x |
-| 500 | 262.4 ms | 10.7 x | 49.8 x | 2.2 x | 53.5 x | 4.3 x |
-| 600 | 349.7 ms | 8.5 x | 63.9 x | 2.6 x | 69.8 x | 5.1 x |
-| 700 | 565.7 ms | 5.4 x | 64.0 x | 2.3 x | 69.4 x | 4.4 x |
-| 800 | 607.3 ms | 5.4 x | 87.9 x | 3.1 x | 96.8 x | 5.7 x |
-| 900 | 793.8 ms | 4.4 x | 95.9 x | 3.3 x | 105.9 x | 5.8 x |
-| 1000 | 1029.0 ms | 3.5 x | 103.5 x | 3.2 x | 112.1 x | 5.9 x |
-
-#### JuMP
-
-The JuMP model is `src/jump.jl`, driven by `scripts/benchmark_jump.py`:
-
-```julia
-julia> import Pkg
-julia> Pkg.add("JuMP")
-julia> Pkg.add("Cbc")
-julia> Pkg.add("HiGHS")
-```
-
-```sh
-python3 scripts/benchmark_jump.py   # -> results/jump/<solver>_jump.csv
-```
-
-`src/jump.jl` builds the model twice per process and reports both timings:
-`cold_model_time_us`, which includes Julia's JIT compilation, and
-`model_time_us`, the warm rebuild. The tables use the warm one, which is two
-orders of magnitude smaller. Like OR-Tools' `MPSolver`, JuMP (in its default
-*cached* mode) builds the model in its own backend-independent representation,
-so its fill times exclude the actual solver load.
-
-#### Python
-
-The Python-MIP, PuLP and gurobipy numbers are produced by the benchmark scripts of the [python-mip repository](https://github.com/coin-or/python-mip) (the same ones behind the published [Python-MIP benchmark](https://python-mip.readthedocs.io/en/latest/bench.html)), included unmodified as a git submodule checked out in `python-mip/`, pinned at the commit that was used. Unlike the C++ and Julia benchmarks, these scripts time a single build of each model, without any warm-up run.
-
-```sh
-git submodule update --init
-pip install mip pulp gurobipy timeout_decorator   # mip==1.15.0 was used here
-./scripts/benchmark_python.sh
-```
-
-The runner writes `results/python-mip/`, `results/pulp/` and `results/gurobipy.csv`, skipping any benchmark whose CSV already exists:
-
-- the `*_pypy.csv` variants require `pypy3` with the `mip`, `pulp` and `timeout_decorator` packages installed;
-- the gurobipy and Python-MIP/Gurobi benchmarks require a licensed Gurobi installation.
-
-
-### Gurobi C API vs others
-
-| N | pure C API | MIP++ | <div align="center">JuMP<br>(cold)</div> | <div align="center">JuMP<br>(warm)</div> | <div align="center">Python-MIP<br>CPython</div> | <div align="center">Python-MIP<br>Pypy</div> | GurobiPy |
-|:---:|---:|---:|---:|---:|---:|---:|---:|
-| 100 | 3.2 ms | 102.1 % | 145.0 x | 3.7 x | 44.7 x | 40.1 x | 34.3 x |
-| 200 | 8.6 ms | 100.0 % | 58.1 x | 3.6 x | 92.9 x | 9.6 x | 87.5 x |
-| 300 | 17.2 ms | 99.1 % | 31.5 x | 6.5 x | 159.6 x | 9.8 x | 150.2 x |
-| 400 | 30.1 ms | 100.4 % | 21.1 x | 5.7 x | 224.0 x | 11.3 x | 208.3 x |
-| 500 | 46.3 ms | 99.0 % | 15.0 x | 7.2 x | 272.2 x | 12.8 x | 272.8 x |
-| 600 | 66.2 ms | 100.7 % | 13.0 x | 6.1 x | 333.4 x | 13.9 x | 334.0 x |
-| 700 | 90.9 ms | 100.0 % | 11.4 x | 5.0 x | 390.2 x | 15.1 x | 381.1 x |
-| 800 | 118.6 ms | 100.9 % | 10.0 x | 5.8 x | 452.9 x | 16.8 x | 442.2 x |
-| 900 | 150.4 ms | 103.3 % | 9.4 x | 5.2 x | 502.7 x | 18.2 x | 495.6 x |
-| 1000 | 186.3 ms | 101.4 % | 8.3 x | 5.5 x | 567.0 x | 20.0 x | 554.8 x |

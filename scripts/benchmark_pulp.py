@@ -32,7 +32,7 @@ results_dir = "results/pulp"
 os.makedirs(results_dir, exist_ok=True)
 
 for python in ["python", "pypy3"]:
-    csv_path = f"{results_dir}/pulp.csv"
+    csv_path = f"{results_dir}/{python}.csv"
     try:
         args_list = [(python, N) for N in range(100, 1001, 100)]
         run(cmd, args_list, repetitions, to_row, csv_path)

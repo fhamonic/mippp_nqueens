@@ -94,13 +94,13 @@ int main(int argc, char * argv[]) {
     error = GRBupdatemodel(model);
     checkGRBError(error, env);
 
-    const int model_time_ms = chrono.lapTimeMs();
-    std::optional<int> solve_time_ms;
+    const double model_time_ms = chrono.lapTimeUs() / 1000.0;
+    std::optional<double> solve_time_ms;
 
     if(N < 20) {
         error = GRBoptimize(model);
         checkGRBError(error, env);
-        const int solve_time_ms = chrono.lapTimeMs();
+        solve_time_ms.emplace(chrono.lapTimeUs() / 1000.0);
         double * sol = (double *)malloc(sizeof(double) * num_variables);
         error =
             GRBgetdblattrarray(model, GRB_DBL_ATTR_X, 0, num_variables, sol);

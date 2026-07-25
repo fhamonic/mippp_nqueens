@@ -1,30 +1,24 @@
 from helper import *
 
-
-def to_float(N, value):
-    return "{:.1f} ms".format(float(value) / 1_000)
+c_api = read_col("results/gurobi/gurobi_c.csv", "model_time_ms")
 
 
-def to_first_scale(N, value):
-    ref_value = table_data[0][1][0][1][N]
-    return "{:.1f} x".format(float(value) / float(ref_value))
+def to_ms(N, value):
+    return "{:.1f} ms".format(float(value))
 
 
-def to_first_percent(N, value):
-    ref_value = table_data[0][1][0][1][N]
-    return "{:.1f} %".format(float(value) / float(ref_value) * 100)
+def to_c_percent(N, value):
+    return "{:.1f} %".format(float(value) / float(c_api[N]) * 100)
+
+
+def to_c_scale(N, value):
+    return "{:.1f} x".format(float(value) / float(c_api[N]))
 
 
 table_data = [
     (
-        "pure C API",
-        [
-            (
-                "",
-                read_col("results/gurobi/gurobi_c.csv", "model_time_ms"),
-                to_float,
-            )
-        ],
+        "Gurobi C API",
+        [("", c_api, to_ms)],
     ),
     (
         "MIP++",
@@ -32,22 +26,22 @@ table_data = [
             (
                 "",
                 read_col("results/mippp/Gurobi_distinct.csv", "model_time_ms"),
-                to_first_percent,
+                to_c_percent,
             )
         ],
     ),
     (
+        "gurobipy",
+        [("", read_col("results/gurobi/gurobipy.csv", "model_time_ms"), to_c_scale)],
+    ),
+    (
         "JuMP",
         [
+            ("warm", read_col("results/jump/Gurobi.csv", "model_time_ms"), to_c_scale),
             (
-                "(cold)",
+                "cold",
                 read_col("results/jump/Gurobi.csv", "cold_model_time_ms"),
-                to_first_scale,
-            ),
-            (
-                "(warm)",
-                read_col("results/jump/Gurobi.csv", "model_time_ms"),
-                to_first_scale,
+                to_c_scale,
             ),
         ],
     ),
@@ -56,24 +50,14 @@ table_data = [
         [
             (
                 "CPython",
-                read_col("results/python-mip/gurobi_cpython.csv", "model_time_ms"),
-                to_first_scale,
+                read_col("results/python-mip/python_Gurobi.csv", "model_time_ms"),
+                to_c_scale,
             ),
             (
-                "Pypy",
-                read_col("results/python-mip/gurobi_pypy.csv", "model_time_ms"),
-                to_first_scale,
+                "PyPy",
+                read_col("results/python-mip/pypy3_Gurobi.csv", "model_time_ms"),
+                to_c_scale,
             ),
-        ],
-    ),
-    (
-        "GurobiPy",
-        [
-            (
-                "",
-                read_col("results/gurobi/gurobipy.csv", "model_time_ms"),
-                to_first_scale,
-            )
         ],
     ),
 ]

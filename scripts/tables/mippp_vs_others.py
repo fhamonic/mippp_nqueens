@@ -1,34 +1,27 @@
 from helper import *
 
 
-def to_float(N, value):
-    return "{:.1f} ms".format(float(value) / 1_000)
+def to_ms(N, value):
+    return "{:.1f} ms".format(float(value))
 
 
-def to_first_scale(N, value):
-    ref_value = table_data[0][1][0][1][N]
-    return "{:.1f} x".format(float(value) / float(ref_value))
+def scale_to(ref_col):
+    def f(N, value):
+        ref = float(ref_col[N])
+        return "—" if ref == 0 else "{:.1f} x".format(float(value) / ref)
+
+    return f
 
 
-def to_highs_scale(N, value):
-    ref_value = table_data[0][1][1][1][N]
-    return "{:.1f} x".format(float(value) / float(ref_value))
-
+mippp_cbc = read_col("results/mippp/Cbc_distinct.csv", "model_time_ms")
+mippp_highs = read_col("results/mippp/Highs_distinct.csv", "model_time_ms")
 
 table_data = [
     (
         "MIP++",
         [
-            (
-                "Cbc",
-                read_col("results/mippp/Cbc_distinct.csv", "model_time_ms"),
-                to_float,
-            ),
-            (
-                "HiGHS",
-                read_col("results/mippp/Highs_distinct.csv", "model_time_ms"),
-                to_float,
-            ),
+            ("Cbc", mippp_cbc, to_ms),
+            ("HiGHS", mippp_highs, to_ms),
         ],
     ),
     (
@@ -37,12 +30,12 @@ table_data = [
             (
                 "Cbc",
                 read_col("results/or_tools/Cbc.csv", "model_time_ms"),
-                to_first_scale,
+                scale_to(mippp_cbc),
             ),
             (
                 "HiGHS",
                 read_col("results/or_tools/Highs.csv", "model_time_ms"),
-                to_highs_scale,
+                scale_to(mippp_highs),
             ),
         ],
     ),
@@ -52,12 +45,12 @@ table_data = [
             (
                 "Cbc",
                 read_col("results/jump/Cbc.csv", "model_time_ms"),
-                to_first_scale,
+                scale_to(mippp_cbc),
             ),
             (
                 "HiGHS",
                 read_col("results/jump/Highs.csv", "model_time_ms"),
-                to_highs_scale,
+                scale_to(mippp_highs),
             ),
         ],
     ),

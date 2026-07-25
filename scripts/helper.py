@@ -13,9 +13,9 @@ def call_executable(cmd):
             text=True,
             check=True,
         )
-        # Strip stderr befor json
         result = process.stderr.strip()
-        result = result[result.find("{") : result.find("}")]
+        # Strip stderr json (for JuMP with GLPK)
+        result = result[result.find("{") : result.find("}")+1]
         return json.loads(result)
     except subprocess.CalledProcessError as e:
         raise Exception(e.stderr.strip() + "\n" + str(e))

@@ -92,8 +92,8 @@ int run(const std::string & solver_id, const int N) {
     const auto num_variables = solver->NumVariables();
     const auto num_constraints = solver->NumConstraints();
 
-    const int model_time_ms = chrono.lapTimeMs();
-    std::optional<int> solve_time_ms;
+    const double model_time_ms = chrono.lapTimeUs() / 1000.0;
+    std::optional<double> solve_time_ms;
 
     if(N < 20) {
         const MPSolver::ResultStatus result_status = solver->Solve();
@@ -102,7 +102,7 @@ int run(const std::string & solver_id, const int N) {
             std::println(stderr, "No solution found.");
             return EXIT_FAILURE;
         }
-        solve_time_ms.emplace(chrono.lapTimeMs());
+        solve_time_ms.emplace(chrono.lapTimeUs() / 1000.0);
         for(int i = 0; i < N; ++i) {
             for(int j = 0; j < N; ++j) {
                 std::print("{}", x[i][j]->solution_value() > 0.5 ? '#' : '+');
