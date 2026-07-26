@@ -145,7 +145,7 @@ The most direct measure of MIP++'s overhead: the pure Gurobi C API in absolute
 milliseconds, MIP++ as a *percentage* of it, and the other Gurobi-capable
 interfaces as multiples of it.
 
-| N | <div align="center">Gurobi C API<br>per constraint</div> | <div align="center">Gurobi C API<br>bulk</div> |   MIP++   | gurobipy | <div align="center">JuMP<br>warm</div> | <div align="center">JuMP<br>cold</div> | <div align="center">Python-MIP<br>CPython</div> | <div align="center">Python-MIP<br>PyPy</div> |
+| N | <div align="center">Gurobi C API<br>per constr.</div> | <div align="center">Gurobi C API<br>bulk</div> |   MIP++   | gurobipy | <div align="center">JuMP<br>warm</div> | <div align="center">JuMP<br>cold</div> | <div align="center">Python-MIP<br>CPython</div> | <div align="center">Python-MIP<br>PyPy</div> |
 |:---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | 100 | 3.2 ms | 103.0 % | 99.3 % | 6.5 x | 3.7 x | 73.2 x | 19.7 x | 36.6 x |
 | 200 | 8.3 ms | 105.8 % | 102.1 % | 9.0 x | 5.5 x | 40.2 x | 19.8 x | 17.6 x |
