@@ -39,6 +39,14 @@ def print_latex_table(table_data):
 \\end{table*}""")
 
 
+def print_markdown_grid(header, rows):
+    """Table whose rows are not indexed by N (backends, variants, ...)."""
+    print("| " + " | ".join(header) + " |")
+    print("|" + ":---:|" + "---:|" * (len(header) - 1))
+    for row in rows:
+        print("| " + " | ".join(row) + " |")
+
+
 def print_markdown_table(table_data):
     cols = [(c[0], sc) for c in table_data for sc in c[1]]
     header = ["N"] + [

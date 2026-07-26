@@ -1,6 +1,7 @@
 from helper import *
 
 c_api = read_col("results/gurobi/gurobi_c.csv", "model_time_ms")
+c_api_bulk = read_col("results/gurobi/gurobi_c_bulk.csv", "model_time_ms")
 
 
 def to_ms(N, value):
@@ -18,7 +19,7 @@ def to_c_scale(N, value):
 table_data = [
     (
         "Gurobi C API",
-        [("", c_api, to_ms)],
+        [("per constraint", c_api, to_ms), ("bulk", c_api_bulk, to_c_percent)],
     ),
     (
         "MIP++",
@@ -37,10 +38,10 @@ table_data = [
     (
         "JuMP",
         [
-            ("warm", read_col("results/jump/Gurobi.csv", "model_time_ms"), to_c_scale),
+            ("warm", read_col("results/jump/Gurobi_direct.csv", "model_time_ms"), to_c_scale),
             (
                 "cold",
-                read_col("results/jump/Gurobi.csv", "cold_model_time_ms"),
+                read_col("results/jump/Gurobi_direct.csv", "cold_model_time_ms"),
                 to_c_scale,
             ),
         ],

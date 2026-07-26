@@ -55,8 +55,15 @@ else()
 endif()
 
 
-add_executable(or_tools src/or_tools.cpp)
-target_include_directories(or_tools PUBLIC include)
-target_link_libraries(or_tools or-tools::or-tools)
-set_project_optimizations(or_tools)
-set_project_warnings(or_tools)
+function(set_ortools_options _target)
+  target_include_directories(${_target} PUBLIC include)
+  target_link_libraries(${_target} or-tools::or-tools)
+  set_project_optimizations(${_target})
+  set_project_warnings(${_target})
+endfunction()
+
+add_executable(or_tools_mpsolver src/or_tools_mpsolver.cpp)
+set_ortools_options(or_tools_mpsolver)
+
+add_executable(or_tools_mathopt src/or_tools_mathopt.cpp)
+set_ortools_options(or_tools_mathopt)

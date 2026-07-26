@@ -1,7 +1,6 @@
 from helper import *
 
-# The four MIP++ build variants, shown for the Cbc backend (the one common to
-# every interface). Change the solver below to inspect another backend.
+# ["Cbc", "COPT", "CPLEX", "GLPK", "Gurobi", "Highs", "MOSEK", "SCIP", "Xpress"]
 SOLVER = "Cbc"
 
 

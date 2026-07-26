@@ -1,5 +1,9 @@
 from helper import *
 
+# HiGHS is the only backend all four interfaces provide: MathOpt has no Cbc, and
+# JuMP's direct mode needs an incrementally modifiable backend, which the Cbc
+# wrapper is not. Cbc and SCIP are covered in the OR-Tools table.
+
 
 def to_ms(N, value):
     return "{:.1f} ms".format(float(value))
@@ -13,28 +17,24 @@ def scale_to(ref_col):
     return f
 
 
-mippp_cbc = read_col("results/mippp/Cbc_distinct.csv", "model_time_ms")
 mippp_highs = read_col("results/mippp/Highs_distinct.csv", "model_time_ms")
 
 table_data = [
     (
         "MIP++",
-        [
-            ("Cbc", mippp_cbc, to_ms),
-            ("HiGHS", mippp_highs, to_ms),
-        ],
+        [("", mippp_highs, to_ms)],
     ),
     (
         "OR-tools",
         [
             (
-                "Cbc",
-                read_col("results/or_tools/Cbc.csv", "model_time_ms"),
-                scale_to(mippp_cbc),
+                "MPSolver",
+                read_col("results/or-tools/Highs_mpsolver.csv", "model_time_ms"),
+                scale_to(mippp_highs),
             ),
             (
-                "HiGHS",
-                read_col("results/or_tools/Highs.csv", "model_time_ms"),
+                "MathOpt",
+                read_col("results/or-tools/Highs_mathopt.csv", "model_time_ms"),
                 scale_to(mippp_highs),
             ),
         ],
@@ -43,13 +43,13 @@ table_data = [
         "JuMP",
         [
             (
-                "Cbc",
-                read_col("results/jump/Cbc.csv", "model_time_ms"),
-                scale_to(mippp_cbc),
+                "cached",
+                read_col("results/jump/Highs_cached.csv", "model_time_ms"),
+                scale_to(mippp_highs),
             ),
             (
-                "HiGHS",
-                read_col("results/jump/Highs.csv", "model_time_ms"),
+                "direct",
+                read_col("results/jump/Highs_direct.csv", "model_time_ms"),
                 scale_to(mippp_highs),
             ),
         ],

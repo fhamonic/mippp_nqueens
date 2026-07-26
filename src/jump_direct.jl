@@ -1,12 +1,15 @@
 using JuMP
 import LinearAlgebra
+import Statistics
 
 const SOLVERS = Dict(
     "Highs"  => (:HiGHS,  :Optimizer),
     "GLPK"   => (:GLPK,   :Optimizer),
-    "Cbc"    => (:Cbc,    :Optimizer),
     "Gurobi" => (:Gurobi, :Optimizer),
 )
+
+# Direct mode requires an incrementally modifiable MOI backend.
+const NOT_INCREMENTAL = Set(["Cbc"])
 
 if length(ARGS) < 2
     println(stderr, "Usage: julia $(PROGRAM_FILE) <solver> <N>")
@@ -14,6 +17,8 @@ if length(ARGS) < 2
 end
 
 solver_key = ARGS[1]
+solver_key in NOT_INCREMENTAL &&
+    error("Solver $(solver_key) does not support direct mode.")
 haskey(SOLVERS, solver_key) || error("Unknown solver $(solver_key).")
 
 N = parse(Int, ARGS[2])
@@ -25,12 +30,14 @@ api_time = @elapsed @eval import $pkg
 OPTIMIZER = @eval $pkg.$opt
 
 function build_model(N, optimizer)
-    model = Model(optimizer)
+    # direct_model() drops the CachingOptimizer and the bridge layer: every
+    # @variable/@constraint below goes straight into the solver's own model.
+    model = direct_model(optimizer())
 
     @variable(model, x[1:N, 1:N], Bin)
 
     # Store reverse, doing it inside the for is O(N^3) -> 10x longer for N=1000
-    xr = reverse(x; dims = 1) 
+    xr = reverse(x; dims = 1)
 
     # One queen in a given row/column
     for i in 1:N
@@ -45,10 +52,19 @@ function build_model(N, optimizer)
     return model
 end
 
+# Starting Julia and loading the solver package costs seconds, so the warm
+# timing is repeated here rather than by the runner: the median of a few
+# GC-separated builds. At integer millisecond resolution and two samples the
+# small-N points used to come out non-monotonic.
 cold_model_time = @elapsed model = build_model(N, OPTIMIZER)
-warm_model_time = @elapsed model = build_model(N, OPTIMIZER)
+warm_times = Float64[]
+for _ in 1:5
+    GC.gc()
+    push!(warm_times, @elapsed build_model(N, OPTIMIZER))
+end
+warm_model_time = Statistics.median(warm_times)
 
-as_milliseconds(t) = round(Int, t * 1e3)
+as_milliseconds(t) = round(t * 1e3; digits = 3)
 
 println(stderr,
     """{"solver_name":"$(solver_name(model))",""" *

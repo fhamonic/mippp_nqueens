@@ -8,6 +8,10 @@ def to_s(N, value):
 
 table_data = [
     (
+        "gurobipy",
+        [("Gurobi", read_col("results/gurobi/gurobipy.csv", "model_time_ms"), to_s)],
+    ),
+    (
         "highspy",
         [("HiGHS", read_col("results/highs/highspy.csv", "model_time_ms"), to_s)],
     ),

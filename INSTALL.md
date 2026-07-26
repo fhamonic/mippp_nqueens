@@ -82,10 +82,11 @@ The executables land in `build/` (`build/mippp`, `build/mippp_distinct`,
 `build/mippp_bulk`, `build/mippp_bulk_distinct`, `build/or_tools`, and
 `build/gurobi_c*` when the Gurobi SDK is found — see §6).
 
-> **or-tools build note:** or-tools 9.15 vendors a FlatZinc test that fails
-> against the abseil version its recipe pins. If the build stops on
-> `fzn-parser_test`, apply the source patch documented in
-> [README.md](README.md#building) and re-run the `conan build` command.
+> [!WARNING]
+> or-tools 9.15 vendors a FlatZinc test that fails against the abseil version
+> its recipe pins. If the build stops on `fzn-parser_test`, apply the source
+> patch documented in [README.md](README.md#building) and re-run the
+> `conan build` command.
 
 ---
 
@@ -108,14 +109,26 @@ order (first match wins):
 | SCIP | `SCIP` | `libscip.so` |
 | Gurobi | `GUROBI` | `libgurobi120.so` |
 
-### Cbc (free, from apt)
+### Cbc (free, from source)
+
+Cbc must be built from the **`devel` branch** — follow the upstream
+instructions at
+<https://github.com/coin-or/Cbc#building-from-source>.
+
+> [!WARNING]
+> **Do not use `apt install coinor-libcbc-dev`.** The packaged Cbc is release
+> 2.10.13, which flushes the constraint matrix on every `addRow` call; only
+> `devel` caches them. Building the model against the release is substantially
+> slower, and the Cbc columns of the benchmarks cannot be reproduced with it.
+> See [README.md § Results](README.md#results).
+
+Then expose the resulting library to MIP++ (add to `~/.bashrc` to make it
+permanent):
 
 ```bash
-sudo apt install coinor-libcbc-dev coinor-libclp-dev
+export MIPPP_CBC_LIBRARY=/path/to/cbc/lib/libCbcSolver.so
+# or, instead: export LD_LIBRARY_PATH=/path/to/cbc/lib:$LD_LIBRARY_PATH
 ```
-
-This installs `libCbcSolver.so` / `libClp.so` into a standard system directory,
-so MIP++ finds them with no extra configuration.
 
 ### GLPK (free, optional, from apt)
 
@@ -148,9 +161,10 @@ export MIPPP_HIGHS_LIBRARY=/opt/highs/lib/libhighs.so
 # or, instead: export LD_LIBRARY_PATH=/opt/highs/lib:$LD_LIBRARY_PATH
 ```
 
-> **Shortcut:** the `highspy` pip wheel (§7) already bundles a `libhighs`; you
-> can point `MIPPP_HIGHS_LIBRARY` at the `.so` inside the installed package
-> instead of building from source.
+> [!TIP]
+> The `highspy` pip wheel (§7) already bundles a `libhighs`; you can point
+> `MIPPP_HIGHS_LIBRARY` at the `.so` inside the installed package instead of
+> building from source.
 
 Solvers whose library is not found are simply skipped by the benchmark runners
 (they print a `Skipped …` line and move on), so you only need the ones you care
@@ -273,7 +287,7 @@ Once the pieces you need are installed:
 make all                              # runs every benchmark script
 # or individually, e.g.:
 python3 scripts/benchmark_mippp.py    # -> results/mippp/<solver>[_bulk][_distinct].csv
-python3 scripts/benchmark_ortools.py
+python3 scripts/benchmark_or-tools.py
 python3 scripts/benchmark_jump.py
 python3 scripts/benchmark_pulp.py
 ```

@@ -40,17 +40,17 @@ def build_nqueens(n):
             name="col({})".format(j),
         )
 
-    # diagonal \
+    # diagonal \  (index the cells directly, scanning all n² per diagonal is O(n³))
     for p, k in enumerate(range(2 - n, n - 2 + 1)):
         queens.addConstr(
-            quicksum(x[i][j] for i in range(n) for j in range(n) if i - j == k) <= 1,
+            quicksum(x[i][i - k] for i in range(max(0, k), min(n, n + k))) <= 1,
             name="diag1({})".format(p),
         )
 
     # diagonal /
-    for p, k in enumerate(range(3, n + n)):
+    for p, k in enumerate(range(1, n + n - 2)):
         queens.addConstr(
-            quicksum(x[i][j] for i in range(n) for j in range(n) if i + j == k) <= 1,
+            quicksum(x[i][k - i] for i in range(max(0, k - n + 1), min(n, k + 1))) <= 1,
             name="diag2({})".format(p),
         )
 
