@@ -65,5 +65,11 @@ endfunction()
 add_executable(or_tools_mpsolver src/or_tools_mpsolver.cpp)
 set_ortools_options(or_tools_mpsolver)
 
+add_executable(or_tools_mpsolver_setcoef src/or_tools_mpsolver_setcoef.cpp)
+set_ortools_options(or_tools_mpsolver_setcoef)
+
 add_executable(or_tools_mathopt src/or_tools_mathopt.cpp)
 set_ortools_options(or_tools_mathopt)
+
+add_executable(or_tools_mathopt_setcoef src/or_tools_mathopt_setcoef.cpp)
+set_ortools_options(or_tools_mathopt_setcoef)

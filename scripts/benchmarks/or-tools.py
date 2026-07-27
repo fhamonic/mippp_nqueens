@@ -9,8 +9,8 @@ def cmd(args):
 results_dir = "results/or-tools"
 os.makedirs(results_dir, exist_ok=True)
 
-for interface in ["mpsolver", "mathopt"]:
-    for solver in ["Cbc", "SCIP", "GLPK", "Gurobi", "Highs"]:
+for interface in ["mpsolver", "mpsolver_setcoef", "mathopt", "mathopt_setcoef"]:
+    for solver in ["Cbc", "SCIP", "GLPK", "Gurobi", "Highs", "Xpress"]:
         csv_path = f"{results_dir}/{solver}_{interface}.csv"
         try:
             args_list = [(interface, solver, N) for N in range(100, 1001, 100)]

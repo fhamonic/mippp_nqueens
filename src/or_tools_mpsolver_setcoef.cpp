@@ -1,3 +1,6 @@
+// Same model as or_tools_mpsolver.cpp, built without LinearExpr: each row is
+// created empty and filled term by term with MPConstraint::SetCoefficient,
+// which avoids the hash map LinearExpr accumulates its terms in.
 #include <memory>
 #include <print>
 #include <string>
@@ -7,7 +10,7 @@
 
 #include "chrono.hpp"
 
-using operations_research::LinearExpr;
+using operations_research::MPConstraint;
 using operations_research::MPSolver;
 using operations_research::MPVariable;
 
@@ -50,44 +53,41 @@ int run(const std::string & solver_id, const int N) {
         }
     }
 
+    const double infinity = MPSolver::infinity();
+
     // one per row
     for(int row = 0; row < N; ++row) {
-        LinearExpr sum;
-        for(int col = 0; col < N; ++col) sum += x[row][col];
-        solver->MakeRowConstraint(sum == 1.0);
+        MPConstraint * const c = solver->MakeRowConstraint(1.0, 1.0);
+        for(int col = 0; col < N; ++col) c->SetCoefficient(x[row][col], 1.0);
     }
     // one per column
     for(int col = 0; col < N; ++col) {
-        LinearExpr sum;
-        for(int row = 0; row < N; ++row) sum += x[row][col];
-        solver->MakeRowConstraint(sum == 1.0);
+        MPConstraint * const c = solver->MakeRowConstraint(1.0, 1.0);
+        for(int row = 0; row < N; ++row) c->SetCoefficient(x[row][col], 1.0);
     }
     // one per upper diagonal \ //
     for(int top_col = 0; top_col < N - 1; ++top_col) {
-        LinearExpr sum;
-        for(int row = 0; row < N - top_col; ++row) sum += x[row][top_col + row];
-        solver->MakeRowConstraint(sum <= 1.0);
+        MPConstraint * const c = solver->MakeRowConstraint(-infinity, 1.0);
+        for(int row = 0; row < N - top_col; ++row)
+            c->SetCoefficient(x[row][top_col + row], 1.0);
     }
     // one per lower diagonal \ //
     for(int left_row = 1; left_row < N - 1; ++left_row) {
-        LinearExpr sum;
+        MPConstraint * const c = solver->MakeRowConstraint(-infinity, 1.0);
         for(int col = 0; col < N - left_row; ++col)
-            sum += x[left_row + col][col];
-        solver->MakeRowConstraint(sum <= 1.0);
+            c->SetCoefficient(x[left_row + col][col], 1.0);
     }
     // one per upper diagonal / //
     for(int left_row = 1; left_row < N; ++left_row) {
-        LinearExpr sum;
+        MPConstraint * const c = solver->MakeRowConstraint(-infinity, 1.0);
         for(int col = 0; col < left_row + 1; ++col)
-            sum += x[left_row - col][col];
-        solver->MakeRowConstraint(sum <= 1.0);
+            c->SetCoefficient(x[left_row - col][col], 1.0);
     }
     // one per lower diagonal / //
     for(int bottom_col = 1; bottom_col < N - 1; ++bottom_col) {
-        LinearExpr sum;
+        MPConstraint * const c = solver->MakeRowConstraint(-infinity, 1.0);
         for(int col = bottom_col; col < N; ++col)
-            sum += x[N - 1 - (col - bottom_col)][col];
-        solver->MakeRowConstraint(sum <= 1.0);
+            c->SetCoefficient(x[N - 1 - (col - bottom_col)][col], 1.0);
     }
 
     const auto num_variables = solver->NumVariables();

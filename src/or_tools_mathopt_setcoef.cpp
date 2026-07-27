@@ -1,3 +1,7 @@
+// Same model as or_tools_mathopt.cpp, built without LinearExpression: each row
+// is created empty and filled term by term with Model::set_coefficient, which
+// avoids the hash map LinearExpression accumulates its terms in.
+#include <limits>
 #include <memory>
 #include <optional>
 #include <print>
@@ -11,7 +15,7 @@
 
 namespace math_opt = operations_research::math_opt;
 
-using math_opt::LinearExpression;
+using math_opt::LinearConstraint;
 using math_opt::Model;
 using math_opt::SolverType;
 using math_opt::Variable;
@@ -63,44 +67,43 @@ int run(const std::string & solver_id, const SolverType solver_type,
         x.push_back(std::move(row_vars));
     }
 
+    constexpr double infinity = std::numeric_limits<double>::infinity();
+
     // one per row
     for(int row = 0; row < N; ++row) {
-        LinearExpression sum;
-        for(int col = 0; col < N; ++col) sum += x[row][col];
-        model.AddLinearConstraint(std::move(sum) == 1.0);
+        const LinearConstraint c = model.AddLinearConstraint(1.0, 1.0);
+        for(int col = 0; col < N; ++col)
+            model.set_coefficient(c, x[row][col], 1.0);
     }
     // one per column
     for(int col = 0; col < N; ++col) {
-        LinearExpression sum;
-        for(int row = 0; row < N; ++row) sum += x[row][col];
-        model.AddLinearConstraint(std::move(sum) == 1.0);
+        const LinearConstraint c = model.AddLinearConstraint(1.0, 1.0);
+        for(int row = 0; row < N; ++row)
+            model.set_coefficient(c, x[row][col], 1.0);
     }
     // one per upper diagonal \ //
     for(int top_col = 0; top_col < N - 1; ++top_col) {
-        LinearExpression sum;
-        for(int row = 0; row < N - top_col; ++row) sum += x[row][top_col + row];
-        model.AddLinearConstraint(std::move(sum) <= 1.0);
+        const LinearConstraint c = model.AddLinearConstraint(-infinity, 1.0);
+        for(int row = 0; row < N - top_col; ++row)
+            model.set_coefficient(c, x[row][top_col + row], 1.0);
     }
     // one per lower diagonal \ //
     for(int left_row = 1; left_row < N - 1; ++left_row) {
-        LinearExpression sum;
+        const LinearConstraint c = model.AddLinearConstraint(-infinity, 1.0);
         for(int col = 0; col < N - left_row; ++col)
-            sum += x[left_row + col][col];
-        model.AddLinearConstraint(std::move(sum) <= 1.0);
+            model.set_coefficient(c, x[left_row + col][col], 1.0);
     }
     // one per upper diagonal / //
     for(int left_row = 1; left_row < N; ++left_row) {
-        LinearExpression sum;
+        const LinearConstraint c = model.AddLinearConstraint(-infinity, 1.0);
         for(int col = 0; col < left_row + 1; ++col)
-            sum += x[left_row - col][col];
-        model.AddLinearConstraint(std::move(sum) <= 1.0);
+            model.set_coefficient(c, x[left_row - col][col], 1.0);
     }
     // one per lower diagonal / //
     for(int bottom_col = 1; bottom_col < N - 1; ++bottom_col) {
-        LinearExpression sum;
+        const LinearConstraint c = model.AddLinearConstraint(-infinity, 1.0);
         for(int col = bottom_col; col < N; ++col)
-            sum += x[N - 1 - (col - bottom_col)][col];
-        model.AddLinearConstraint(std::move(sum) <= 1.0);
+            model.set_coefficient(c, x[N - 1 - (col - bottom_col)][col], 1.0);
     }
 
     const auto num_variables = model.num_variables();

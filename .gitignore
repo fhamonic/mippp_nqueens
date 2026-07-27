@@ -1,10 +1,5 @@
 .vscode
 /build
 /mippp
-/results
 __pycache__/
-CMakeUserPresets.json
-
-queens-mip-cbc.csv
-gurobipy.csv
-queens-pulp.csv
+CMakeUserPresets.json

@@ -21,6 +21,11 @@ def percentage_to(ref_col):
     return f
 
 
+# The OR-Tools columns are the `_setcoef` variants: same model built with
+# MakeRowConstraint + SetCoefficient / AddLinearConstraint + set_coefficient
+# rather than with an expression object, which is the faster of the two forms
+# both APIs offer. See `or-tools_modes.py` for the two side by side.
+
 mippp_cbc = read_col("results/mippp/Cbc_distinct.csv", "model_time_ms")
 mippp_highs = read_col("results/mippp/Highs_distinct.csv", "model_time_ms")
 mippp_scip = read_col("results/mippp/SCIP_distinct.csv", "model_time_ms")
@@ -35,36 +40,36 @@ table_data = [
         ],
     ),
     (
-        "OR-tools (MPSolver)",
+        "MPSolver",
         [
             (
                 "Cbc",
-                read_col("results/or-tools/Cbc_mpsolver.csv", "model_time_ms"),
+                read_col("results/or-tools/Cbc_mpsolver_setcoef.csv", "model_time_ms"),
                 percentage_to(mippp_cbc),
             ),
             (
                 "HiGHS",
-                read_col("results/or-tools/Highs_mpsolver.csv", "model_time_ms"),
+                read_col("results/or-tools/Highs_mpsolver_setcoef.csv", "model_time_ms"),
                 percentage_to(mippp_highs),
             ),
             (
                 "SCIP",
-                read_col("results/or-tools/SCIP_mpsolver.csv", "model_time_ms"),
+                read_col("results/or-tools/SCIP_mpsolver_setcoef.csv", "model_time_ms"),
                 percentage_to(mippp_scip),
             ),
         ],
     ),
     (
-        "OR-tools (MathOpt)",
+        "MathOpt",
         [
             (
                 "HiGHS",
-                read_col("results/or-tools/Highs_mathopt.csv", "model_time_ms"),
+                read_col("results/or-tools/Highs_mathopt_setcoef.csv", "model_time_ms"),
                 percentage_to(mippp_highs),
             ),
             (
                 "SCIP",
-                read_col("results/or-tools/SCIP_mathopt.csv", "model_time_ms"),
+                read_col("results/or-tools/SCIP_mathopt_setcoef.csv", "model_time_ms"),
                 percentage_to(mippp_scip),
             ),
         ],

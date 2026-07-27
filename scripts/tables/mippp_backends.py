@@ -3,7 +3,7 @@ from helper import *
 # Every backend a MIP++ build was found for at runtime. One-at-a-time
 # (`mippp`), the one variant available for all of them: the GLPK backend aborts
 # in `mippp_distinct`.
-SOLVERS = ["Cbc", "MOSEK", "Highs", "CPLEX", "Gurobi", "GLPK", "SCIP"]
+SOLVERS = ["Cbc", "MOSEK", "Highs", "CPLEX", "Gurobi", "GLPK", "Xpress", "SCIP"]
 LABELS = {"Highs": "HiGHS"}
 
 

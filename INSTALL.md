@@ -275,7 +275,7 @@ julia> Pkg.add(["GLPK", "Gurobi"])                # optional extra backends
 Notes:
 - The `Cbc` and `HiGHS` Julia packages ship their own solver binaries: no system library is required for JuMP.
 - The `Gurobi` Julia package needs `GUROBI_HOME` before running `Pkg.add("Gurobi")` (or `Pkg.build("Gurobi")` afterwards).
-- `julia` must be on your `PATH`; [scripts/benchmark_jump.py](scripts/benchmark_jump.py) invokes it directly.
+- `julia` must be on your `PATH`; [scripts/benchmarks/jump.py](scripts/benchmarks/jump.py) invokes it directly.
 
 ---
 
@@ -286,10 +286,10 @@ Once the pieces you need are installed:
 ```bash
 make all                              # runs every benchmark script
 # or individually, e.g.:
-python3 scripts/benchmark_mippp.py    # -> results/mippp/<solver>[_bulk][_distinct].csv
-python3 scripts/benchmark_or-tools.py
-python3 scripts/benchmark_jump.py
-python3 scripts/benchmark_pulp.py
+python3 scripts/benchmarks/mippp.py    # -> results/mippp/<solver>[_bulk][_distinct].csv
+python3 scripts/benchmarks/or-tools.py
+python3 scripts/benchmarks/jump.py
+python3 scripts/benchmarks/pulp.py
 ```
 
 Each runner writes CSV files under `results/`, skipping any solver or interpreter

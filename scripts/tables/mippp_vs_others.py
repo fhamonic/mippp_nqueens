@@ -29,12 +29,12 @@ table_data = [
         [
             (
                 "MPSolver",
-                read_col("results/or-tools/Highs_mpsolver.csv", "model_time_ms"),
+                read_col("results/or-tools/Highs_mpsolver_setcoef.csv", "model_time_ms"),
                 scale_to(mippp_highs),
             ),
             (
                 "MathOpt",
-                read_col("results/or-tools/Highs_mathopt.csv", "model_time_ms"),
+                read_col("results/or-tools/Highs_mathopt_setcoef.csv", "model_time_ms"),
                 scale_to(mippp_highs),
             ),
         ],
