@@ -1,4 +1,5 @@
 #include <iostream>
+#include <print>
 #include <ranges>
 
 #include "mippp/solvers/cbc/all.hpp"
@@ -44,14 +45,18 @@ int main(int argc, char * argv[]) {
 template <typename API, typename MODEL>
 int run(const std::string & solver, const int N) {
     Chrono chrono;
-    API api;
+    const API & api = API::load();
     int api_time_ms = chrono.lapTimeMs();
     MODEL model(api);
 
+    const auto indices = std::views::iota(0, N);
+    /*
     auto X = model.add_binary_variables(
         N * N, [N](int row, int col) { return row * N + col; });
-
-    auto indices = std::views::iota(0, N);
+    /*/
+    auto X = model.add_binary_variables(
+        std::views::cartesian_product(indices, indices));
+    //*/
     // one per row
     model.add_constraints(indices, [&](auto && row) {
         return xsum(indices, [&, row](auto && col) { return X(row, col); }) ==

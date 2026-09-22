@@ -31,13 +31,13 @@ for interface, expr_label, setcoef_label, solvers in [
         "mpsolver",
         "MPSolver<br>LinearExpr",
         "MPSolver<br>SetCoefficient",
-        [("Cbc", "Cbc"), ("Highs", "HiGHS"), ("SCIP", "SCIP")],
+        [("Cbc", "Cbc"), ("Highs", "HiGHS"), ("SCIP", "SCIP"), ("Xpress", "Xpress")],
     ),
     (
         "mathopt",
         "MathOpt<br>LinearExpression",
         "MathOpt<br>set_coefficient",
-        [("Highs", "HiGHS"), ("SCIP", "SCIP")],
+        [("Highs", "HiGHS"), ("SCIP", "SCIP"), ("Xpress", "Xpress")],
     ),
 ]:
     table_data.append(

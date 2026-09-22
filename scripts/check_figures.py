@@ -96,19 +96,21 @@ def build_checks():
     add("MIP++ vs MPSolver (Cbc)", f"{lo}–{hi}× faster than `MPSolver` for Cbc", "for Cbc")
     lo, hi = span(lambda N: ortools("Highs", "mpsolver_setcoef")[N] / highs[N])
     add("MIP++ vs MPSolver (HiGHS)", f"{lo}–{hi}× faster", "for HiGHS")
+    lo, hi = span(lambda N: ortools("Xpress", "mpsolver_setcoef")[N] / mippp("Xpress_distinct")[N])
+    add("MIP++ vs MPSolver (Xpress)", f"{lo}–{hi}× faster for Xpress", "for Xpress")
     add("MathOpt worst case",
         f"up to {ortools('Highs', 'mathopt_setcoef')[1000] / highs[1000]:.1f}× MIP++",
         "MathOpt is slower still")
     lo, hi = span(
         lambda N: min(
             ortools(s, "mpsolver")[N] / ortools(s, "mpsolver_setcoef")[N]
-            for s in ("Cbc", "Highs", "SCIP")
+            for s in ("Cbc", "Highs", "SCIP", "Xpress")
         )
     )
     _, hi = span(
         lambda N: max(
             ortools(s, "mpsolver")[N] / ortools(s, "mpsolver_setcoef")[N]
-            for s in ("Cbc", "Highs", "SCIP")
+            for s in ("Cbc", "Highs", "SCIP", "Xpress")
         )
     )
     add("expression penalty", f"`MPSolver` {lo}–{hi}×", "expression object costs")
@@ -120,6 +122,9 @@ def build_checks():
     add("direct/cached Gurobi",
         f"{jump('Gurobi', 'direct')[1000] / jump('Gurobi', 'cached')[1000]:.1f}× for Gurobi",
         "Cutting out the caching layer")
+    add("MPSolver vs MIP++ at N=1000",
+        f"({ortools('Highs', 'mpsolver_setcoef')[1000] / highs[1000]:.1f}× on HiGHS",
+        "costs far less there")
     add("MIP++ HiGHS at N=1000", f"({highs[1000]:.1f} ms", "Against MIP++ on HiGHS")
     add("JuMP direct vs MIP++",
         f"{jump('Highs', 'direct')[1000] / highs[1000]:.0f}× for JuMP direct", "that is")
@@ -128,11 +133,23 @@ def build_checks():
 
     # -- backends
     add("SCIP vs Cbc", f"({mippp('SCIP')[1000] / mippp('Cbc')[1000]:.1f}× Cbc",
-        "order of magnitude behind")
+        "far behind the rest")
     for solver in ("GLPK", "Xpress", "CPLEX"):
         series = mippp(solver)
         drift = (series[1000] / 1e6) / (series[200] / 4e4)
         add(f"{solver} per-nonzero drift", f"{solver} (×{drift:.1f}", "per nonzero")
+
+    # -- build variants at N = 1000, as the summary table rounds them
+    backends = ("Cbc", "MOSEK", "COPT", "Highs", "CPLEX", "Gurobi", "GLPK", "Xpress", "SCIP")
+    label = {"Highs": "HiGHS"}
+    hint = {b: round(100 - mippp(f"{b}_distinct")[1000] / mippp(b)[1000] * 100) for b in backends}
+    bulk = {b: round(100 - mippp(f"{b}_bulk")[1000] / mippp(b)[1000] * 100) for b in backends}
+    add("hint span", f"worth {min(hint.values())}–{max(hint.values())} %", "never hurts")
+    for b in ("MOSEK", "COPT", "SCIP"):
+        add(f"hint {b}", f"{label.get(b, b)} ({hint[b]} %)", "never hurts")
+    for b in ("CPLEX", "COPT", "Xpress"):
+        add(f"bulk {b}", f"{bulk[b]} % for {label.get(b, b)}", "Bulk cuts both ways")
+    add("bulk MOSEK", f"MOSEK (+{-bulk['MOSEK']} %)", "Bulk cuts both ways")
 
     # -- sampling quality
     errors = [
@@ -147,6 +164,12 @@ def build_checks():
         "less than a point")
     add("points well above", f"{sum(1 for e in over if e > 2.5)} by more", "less than a point")
     add("worst point", f"{max(over):.1f} %)", "single worst point")
+    xpress = [
+        float(r["error_pct"])
+        for path in sorted(glob.glob(str(ROOT / "results" / "mippp" / "Xpress*.csv")))
+        for r in csv.DictReader(open(path))
+    ]
+    add("worst Xpress point", f"(up to {max(xpress):.1f} %)", "25-repetition cap")
     return checks
 
 

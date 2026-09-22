@@ -2,7 +2,7 @@ from helper import *
 
 # What each axis is worth per backend, at the largest model of the sweep.
 N = "1000"
-SOLVERS = ["Cbc", "MOSEK", "Highs", "CPLEX", "Gurobi", "GLPK", "Xpress", "SCIP"]
+SOLVERS = ["Cbc", "MOSEK", "COPT", "Highs", "CPLEX", "Gurobi", "GLPK", "Xpress", "SCIP"]
 LABELS = {"Highs": "HiGHS"}
 VARIANTS = ["_distinct", "_bulk", "_bulk_distinct"]
 

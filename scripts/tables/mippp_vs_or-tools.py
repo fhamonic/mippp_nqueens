@@ -29,6 +29,7 @@ def percentage_to(ref_col):
 mippp_cbc = read_col("results/mippp/Cbc_distinct.csv", "model_time_ms")
 mippp_highs = read_col("results/mippp/Highs_distinct.csv", "model_time_ms")
 mippp_scip = read_col("results/mippp/SCIP_distinct.csv", "model_time_ms")
+mippp_xpress = read_col("results/mippp/Xpress_distinct.csv", "model_time_ms")
 
 table_data = [
     (
@@ -37,6 +38,7 @@ table_data = [
             ("Cbc", mippp_cbc, to_ms),
             ("HiGHS", mippp_highs, to_ms),
             ("SCIP", mippp_scip, to_ms),
+            ("Xpress", mippp_xpress, to_ms),
         ],
     ),
     (
@@ -57,6 +59,11 @@ table_data = [
                 read_col("results/or-tools/SCIP_mpsolver_setcoef.csv", "model_time_ms"),
                 percentage_to(mippp_scip),
             ),
+            (
+                "Xpress",
+                read_col("results/or-tools/Xpress_mpsolver_setcoef.csv", "model_time_ms"),
+                percentage_to(mippp_xpress),
+            ),
         ],
     ),
     (
@@ -71,6 +78,11 @@ table_data = [
                 "SCIP",
                 read_col("results/or-tools/SCIP_mathopt_setcoef.csv", "model_time_ms"),
                 percentage_to(mippp_scip),
+            ),
+            (
+                "Xpress",
+                read_col("results/or-tools/Xpress_mathopt_setcoef.csv", "model_time_ms"),
+                percentage_to(mippp_xpress),
             ),
         ],
     ),
